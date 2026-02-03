@@ -1,0 +1,1263 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-02-02T03:41:41.732Z",
+  "stack": {
+    "primaryLanguage": "typescript",
+    "languages": [
+      "typescript",
+      "javascript"
+    ],
+    "frameworks": [],
+    "buildTools": [
+      "docker-compose"
+    ],
+    "testFrameworks": [],
+    "packageManager": null,
+    "isMonorepo": false,
+    "hasDocker": true,
+    "hasCI": false
+  },
+  "structure": {
+    "totalFiles": 37374,
+    "topDirectories": [
+      {
+        "name": "AGENTS.md",
+        "fileCount": 1
+      },
+      {
+        "name": "docker-compose.yml",
+        "fileCount": 1
+      },
+      {
+        "name": "fiscalzen-api",
+        "fileCount": 37282
+      },
+      {
+        "name": "fiscalzen-app",
+        "fileCount": 90
+      }
+    ],
+    "languageDistribution": [
+      {
+        "extension": ".js",
+        "count": 16860
+      },
+      {
+        "extension": ".ts",
+        "count": 8373
+      },
+      {
+        "extension": ".map",
+        "count": 7257
+      },
+      {
+        "extension": ".json",
+        "count": 1548
+      },
+      {
+        "extension": ".md",
+        "count": 946
+      },
+      {
+        "extension": ".mjs",
+        "count": 520
+      },
+      {
+        "extension": ".mts",
+        "count": 408
+      },
+      {
+        "extension": ".cjs",
+        "count": 333
+      },
+      {
+        "extension": ".cts",
+        "count": 132
+      },
+      {
+        "extension": ".tsx",
+        "count": 61
+      }
+    ]
+  },
+  "architecture": {
+    "layers": [
+      {
+        "name": "Controllers",
+        "description": "Request handling and routing",
+        "directories": [
+          "fiscalzen-api",
+          "fiscalzen-api\\test",
+          "fiscalzen-api\\src"
+        ],
+        "symbolCount": 3,
+        "dependsOn": [
+          "Services"
+        ]
+      },
+      {
+        "name": "Services",
+        "description": "Business logic and orchestration",
+        "directories": [
+          "fiscalzen-api\\src"
+        ],
+        "symbolCount": 1,
+        "dependsOn": []
+      },
+      {
+        "name": "Utils",
+        "description": "Shared utilities and helpers",
+        "directories": [
+          "fiscalzen-app\\src\\lib"
+        ],
+        "symbolCount": 20,
+        "dependsOn": []
+      },
+      {
+        "name": "Components",
+        "description": "UI components and views",
+        "directories": [
+          "fiscalzen-app\\src\\components\\ui",
+          "fiscalzen-app\\src\\components\\custom"
+        ],
+        "symbolCount": 308,
+        "dependsOn": []
+      }
+    ],
+    "patterns": [
+      {
+        "name": "Service Layer",
+        "confidence": 0.85,
+        "description": "Encapsulates business logic in service classes",
+        "occurrences": 1
+      },
+      {
+        "name": "Controller",
+        "confidence": 0.9,
+        "description": "Handles incoming requests and returns responses",
+        "occurrences": 1
+      }
+    ],
+    "entryPoints": [
+      "fiscalzen-api\\src\\main.ts",
+      "fiscalzen-app\\src\\types\\index.ts",
+      "fiscalzen-app\\src\\main.tsx"
+    ]
+  },
+  "symbols": {
+    "classes": [
+      {
+        "name": "AppController",
+        "kind": "class",
+        "file": "fiscalzen-api\\src\\app.controller.ts",
+        "line": 5,
+        "exported": true
+      },
+      {
+        "name": "AppModule",
+        "kind": "class",
+        "file": "fiscalzen-api\\src\\app.module.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "AppService",
+        "kind": "class",
+        "file": "fiscalzen-api\\src\\app.service.ts",
+        "line": 4,
+        "exported": true
+      }
+    ],
+    "interfaces": [
+      {
+        "name": "ApiKey",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 263,
+        "exported": true
+      },
+      {
+        "name": "Certificado",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 29,
+        "exported": true
+      },
+      {
+        "name": "ConferenciaSped",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 252,
+        "exported": true
+      },
+      {
+        "name": "DashboardStats",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 174,
+        "exported": true
+      },
+      {
+        "name": "Empresa",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "Endereco",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "FiltroNotas",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 159,
+        "exported": true
+      },
+      {
+        "name": "GraficoDados",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 185,
+        "exported": true
+      },
+      {
+        "name": "ItemNotaFiscal",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 125,
+        "exported": true
+      },
+      {
+        "name": "LogIntegracao",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 224,
+        "exported": true
+      },
+      {
+        "name": "Manifestacao",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 146,
+        "exported": true
+      },
+      {
+        "name": "NotaFiscal",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 58,
+        "exported": true
+      },
+      {
+        "name": "Notificacao",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 212,
+        "exported": true
+      },
+      {
+        "name": "RelatorioConfig",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 194,
+        "exported": true
+      },
+      {
+        "name": "SpedConfig",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 237,
+        "exported": true
+      },
+      {
+        "name": "Tag",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 289,
+        "exported": true
+      },
+      {
+        "name": "Usuario",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 39,
+        "exported": true
+      },
+      {
+        "name": "Webhook",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 276,
+        "exported": true
+      },
+      {
+        "name": "AuthState",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\hooks\\useStore.ts",
+        "line": 22,
+        "exported": false
+      },
+      {
+        "name": "DashboardState",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\hooks\\useStore.ts",
+        "line": 190,
+        "exported": false
+      },
+      {
+        "name": "HeaderProps",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\components\\custom\\Header.tsx",
+        "line": 40,
+        "exported": false
+      },
+      {
+        "name": "NavItem",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\components\\custom\\Sidebar.tsx",
+        "line": 34,
+        "exported": false
+      },
+      {
+        "name": "NotasState",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\hooks\\useStore.ts",
+        "line": 59,
+        "exported": false
+      },
+      {
+        "name": "NotificacoesState",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\hooks\\useStore.ts",
+        "line": 138,
+        "exported": false
+      },
+      {
+        "name": "StatCardProps",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\sections\\Manifestacao.tsx",
+        "line": 470,
+        "exported": false
+      },
+      {
+        "name": "StatCardProps",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\sections\\Dashboard.tsx",
+        "line": 386,
+        "exported": false
+      },
+      {
+        "name": "SummaryCardProps",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\sections\\Relatorios.tsx",
+        "line": 501,
+        "exported": false
+      },
+      {
+        "name": "TagsState",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\hooks\\useStore.ts",
+        "line": 229,
+        "exported": false
+      },
+      {
+        "name": "UIState",
+        "kind": "interface",
+        "file": "fiscalzen-app\\src\\hooks\\useStore.ts",
+        "line": 207,
+        "exported": false
+      }
+    ],
+    "functions": [
+      {
+        "name": "cn",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "Dashboard",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\sections\\Dashboard.tsx",
+        "line": 49,
+        "exported": true
+      },
+      {
+        "name": "daysDifference",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 177,
+        "exported": true
+      },
+      {
+        "name": "debounce",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 165,
+        "exported": true
+      },
+      {
+        "name": "downloadFile",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 95,
+        "exported": true
+      },
+      {
+        "name": "exportToExcel",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 226,
+        "exported": true
+      },
+      {
+        "name": "formatChaveAcesso",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 73,
+        "exported": true
+      },
+      {
+        "name": "formatCNPJ",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 9,
+        "exported": true
+      },
+      {
+        "name": "formatCNPJCPF",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 31,
+        "exported": true
+      },
+      {
+        "name": "formatCPF",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 20,
+        "exported": true
+      },
+      {
+        "name": "formatCurrency",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 40,
+        "exported": true
+      },
+      {
+        "name": "formatDate",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 49,
+        "exported": true
+      },
+      {
+        "name": "formatDateTime",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 60,
+        "exported": true
+      },
+      {
+        "name": "generateRandomColor",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 111,
+        "exported": true
+      },
+      {
+        "name": "getStatusColor",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 183,
+        "exported": true
+      },
+      {
+        "name": "getStatusLabel",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 204,
+        "exported": true
+      },
+      {
+        "name": "groupBy",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 155,
+        "exported": true
+      },
+      {
+        "name": "Header",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\custom\\Header.tsx",
+        "line": 44,
+        "exported": true
+      },
+      {
+        "name": "isValidCNPJ",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 122,
+        "exported": true
+      },
+      {
+        "name": "Manifestacao",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\sections\\Manifestacao.tsx",
+        "line": 42,
+        "exported": true
+      },
+      {
+        "name": "NotasFiscais",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\sections\\NotasFiscais.tsx",
+        "line": 58,
+        "exported": true
+      },
+      {
+        "name": "parseXML",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 85,
+        "exported": true
+      },
+      {
+        "name": "Relatorios",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\sections\\Relatorios.tsx",
+        "line": 58,
+        "exported": true
+      },
+      {
+        "name": "Sidebar",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\custom\\Sidebar.tsx",
+        "line": 124,
+        "exported": true
+      },
+      {
+        "name": "truncateText",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\lib\\utils.ts",
+        "line": 79,
+        "exported": true
+      },
+      {
+        "name": "useIsMobile",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\hooks\\use-mobile.ts",
+        "line": 5,
+        "exported": true
+      },
+      {
+        "name": "Accordion",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\accordion.tsx",
+        "line": 7,
+        "exported": false
+      },
+      {
+        "name": "AccordionContent",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\accordion.tsx",
+        "line": 48,
+        "exported": false
+      },
+      {
+        "name": "AccordionItem",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\accordion.tsx",
+        "line": 13,
+        "exported": false
+      },
+      {
+        "name": "AccordionTrigger",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\accordion.tsx",
+        "line": 26,
+        "exported": false
+      },
+      {
+        "name": "Alert",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert.tsx",
+        "line": 22,
+        "exported": false
+      },
+      {
+        "name": "AlertDescription",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert.tsx",
+        "line": 50,
+        "exported": false
+      },
+      {
+        "name": "AlertDialog",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 7,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogAction",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 119,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogCancel",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 131,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogContent",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 45,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogDescription",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 106,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogFooter",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 77,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogHeader",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 64,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogOverlay",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 29,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogPortal",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 21,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogTitle",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 93,
+        "exported": false
+      },
+      {
+        "name": "AlertDialogTrigger",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert-dialog.tsx",
+        "line": 13,
+        "exported": false
+      },
+      {
+        "name": "AlertTitle",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\alert.tsx",
+        "line": 37,
+        "exported": false
+      },
+      {
+        "name": "App",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\App.tsx",
+        "line": 13,
+        "exported": false
+      },
+      {
+        "name": "AspectRatio",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\aspect-ratio.tsx",
+        "line": 5,
+        "exported": false
+      },
+      {
+        "name": "Avatar",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\avatar.tsx",
+        "line": 6,
+        "exported": false
+      },
+      {
+        "name": "AvatarFallback",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\avatar.tsx",
+        "line": 35,
+        "exported": false
+      },
+      {
+        "name": "AvatarImage",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\avatar.tsx",
+        "line": 22,
+        "exported": false
+      },
+      {
+        "name": "Badge",
+        "kind": "function",
+        "file": "fiscalzen-app\\src\\components\\ui\\badge.tsx",
+        "line": 28,
+        "exported": false
+      }
+    ],
+    "types": [
+      {
+        "name": "ChartConfig",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\chart.tsx",
+        "line": 11,
+        "exported": true
+      },
+      {
+        "name": "StatusManifestacao",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 55,
+        "exported": true
+      },
+      {
+        "name": "StatusSefaz",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 54,
+        "exported": true
+      },
+      {
+        "name": "TipoDocumento",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 53,
+        "exported": true
+      },
+      {
+        "name": "TipoManifestacao",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\types\\index.ts",
+        "line": 56,
+        "exported": true
+      },
+      {
+        "name": "CarouselApi",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 10,
+        "exported": false
+      },
+      {
+        "name": "CarouselApi",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 233,
+        "exported": false
+      },
+      {
+        "name": "CarouselContextProps",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 22,
+        "exported": false
+      },
+      {
+        "name": "CarouselOptions",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 12,
+        "exported": false
+      },
+      {
+        "name": "CarouselPlugin",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 13,
+        "exported": false
+      },
+      {
+        "name": "CarouselProps",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 15,
+        "exported": false
+      },
+      {
+        "name": "ChartContextProps",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\chart.tsx",
+        "line": 21,
+        "exported": false
+      },
+      {
+        "name": "ControllerProps",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\form.tsx",
+        "line": 11,
+        "exported": false
+      },
+      {
+        "name": "DayButton",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\calendar.tsx",
+        "line": 12,
+        "exported": false
+      },
+      {
+        "name": "FieldPath",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\form.tsx",
+        "line": 12,
+        "exported": false
+      },
+      {
+        "name": "FieldValues",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\form.tsx",
+        "line": 13,
+        "exported": false
+      },
+      {
+        "name": "FormFieldContextValue",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\form.tsx",
+        "line": 21,
+        "exported": false
+      },
+      {
+        "name": "FormItemContextValue",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\form.tsx",
+        "line": 68,
+        "exported": false
+      },
+      {
+        "name": "PaginationLinkProps",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\pagination.tsx",
+        "line": 40,
+        "exported": false
+      },
+      {
+        "name": "SidebarContextProps",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\sidebar.tsx",
+        "line": 35,
+        "exported": false
+      },
+      {
+        "name": "UseCarouselParameters",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 11,
+        "exported": false
+      },
+      {
+        "name": "UseEmblaCarouselType",
+        "kind": "type",
+        "file": "fiscalzen-app\\src\\components\\ui\\carousel.tsx",
+        "line": 3,
+        "exported": false
+      }
+    ],
+    "enums": []
+  },
+  "publicAPI": [
+    {
+      "name": "ApiKey",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 263,
+      "exported": true
+    },
+    {
+      "name": "AppController",
+      "kind": "class",
+      "file": "fiscalzen-api\\src\\app.controller.ts",
+      "line": 5,
+      "exported": true
+    },
+    {
+      "name": "AppModule",
+      "kind": "class",
+      "file": "fiscalzen-api\\src\\app.module.ts",
+      "line": 10,
+      "exported": true
+    },
+    {
+      "name": "AppService",
+      "kind": "class",
+      "file": "fiscalzen-api\\src\\app.service.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "Certificado",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 29,
+      "exported": true
+    },
+    {
+      "name": "ChartConfig",
+      "kind": "type",
+      "file": "fiscalzen-app\\src\\components\\ui\\chart.tsx",
+      "line": 11,
+      "exported": true
+    },
+    {
+      "name": "cn",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "ConferenciaSped",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 252,
+      "exported": true
+    },
+    {
+      "name": "Dashboard",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\sections\\Dashboard.tsx",
+      "line": 49,
+      "exported": true
+    },
+    {
+      "name": "DashboardStats",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 174,
+      "exported": true
+    },
+    {
+      "name": "daysDifference",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 177,
+      "exported": true
+    },
+    {
+      "name": "debounce",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 165,
+      "exported": true
+    },
+    {
+      "name": "downloadFile",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 95,
+      "exported": true
+    },
+    {
+      "name": "Empresa",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 3,
+      "exported": true
+    },
+    {
+      "name": "Endereco",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 19,
+      "exported": true
+    },
+    {
+      "name": "exportToExcel",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 226,
+      "exported": true
+    },
+    {
+      "name": "FiltroNotas",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 159,
+      "exported": true
+    },
+    {
+      "name": "formatChaveAcesso",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 73,
+      "exported": true
+    },
+    {
+      "name": "formatCNPJ",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 9,
+      "exported": true
+    },
+    {
+      "name": "formatCNPJCPF",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 31,
+      "exported": true
+    },
+    {
+      "name": "formatCPF",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 20,
+      "exported": true
+    },
+    {
+      "name": "formatCurrency",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 40,
+      "exported": true
+    },
+    {
+      "name": "formatDate",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 49,
+      "exported": true
+    },
+    {
+      "name": "formatDateTime",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 60,
+      "exported": true
+    },
+    {
+      "name": "generateRandomColor",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 111,
+      "exported": true
+    },
+    {
+      "name": "getStatusColor",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 183,
+      "exported": true
+    },
+    {
+      "name": "getStatusLabel",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 204,
+      "exported": true
+    },
+    {
+      "name": "GraficoDados",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 185,
+      "exported": true
+    },
+    {
+      "name": "groupBy",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 155,
+      "exported": true
+    },
+    {
+      "name": "Header",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\components\\custom\\Header.tsx",
+      "line": 44,
+      "exported": true
+    },
+    {
+      "name": "isValidCNPJ",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 122,
+      "exported": true
+    },
+    {
+      "name": "ItemNotaFiscal",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 125,
+      "exported": true
+    },
+    {
+      "name": "LogIntegracao",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 224,
+      "exported": true
+    },
+    {
+      "name": "Manifestacao",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 146,
+      "exported": true
+    },
+    {
+      "name": "Manifestacao",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\sections\\Manifestacao.tsx",
+      "line": 42,
+      "exported": true
+    },
+    {
+      "name": "NotaFiscal",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 58,
+      "exported": true
+    },
+    {
+      "name": "NotasFiscais",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\sections\\NotasFiscais.tsx",
+      "line": 58,
+      "exported": true
+    },
+    {
+      "name": "Notificacao",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 212,
+      "exported": true
+    },
+    {
+      "name": "parseXML",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 85,
+      "exported": true
+    },
+    {
+      "name": "RelatorioConfig",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 194,
+      "exported": true
+    },
+    {
+      "name": "Relatorios",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\sections\\Relatorios.tsx",
+      "line": 58,
+      "exported": true
+    },
+    {
+      "name": "Sidebar",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\components\\custom\\Sidebar.tsx",
+      "line": 124,
+      "exported": true
+    },
+    {
+      "name": "SpedConfig",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 237,
+      "exported": true
+    },
+    {
+      "name": "StatusManifestacao",
+      "kind": "type",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 55,
+      "exported": true
+    },
+    {
+      "name": "StatusSefaz",
+      "kind": "type",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 54,
+      "exported": true
+    },
+    {
+      "name": "Tag",
+      "kind": "interface",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 289,
+      "exported": true
+    },
+    {
+      "name": "TipoDocumento",
+      "kind": "type",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 53,
+      "exported": true
+    },
+    {
+      "name": "TipoManifestacao",
+      "kind": "type",
+      "file": "fiscalzen-app\\src\\types\\index.ts",
+      "line": 56,
+      "exported": true
+    },
+    {
+      "name": "truncateText",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\lib\\utils.ts",
+      "line": 79,
+      "exported": true
+    },
+    {
+      "name": "useIsMobile",
+      "kind": "function",
+      "file": "fiscalzen-app\\src\\hooks\\use-mobile.ts",
+      "line": 5,
+      "exported": true
+    }
+  ],
+  "dependencies": {
+    "mostImported": [
+      {
+        "file": "C:\\Users\\InfoHunters\\Downloads\\FiscalZenProject\\fiscalzen-api\\src\\app.service.ts",
+        "importedBy": 3
+      },
+      {
+        "file": "C:\\Users\\InfoHunters\\Downloads\\FiscalZenProject\\fiscalzen-api\\src\\app.module.ts",
+        "importedBy": 2
+      },
+      {
+        "file": "C:\\Users\\InfoHunters\\Downloads\\FiscalZenProject\\fiscalzen-api\\src\\app.controller.ts",
+        "importedBy": 2
+      },
+      {
+        "file": "C:\\Users\\InfoHunters\\Downloads\\FiscalZenProject\\fiscalzen-app\\src\\App.tsx",
+        "importedBy": 1
+      }
+    ]
+  },
+  "stats": {
+    "totalSymbols": 384,
+    "exportedSymbols": 52,
+    "analysisTimeMs": 42
+  }
+}

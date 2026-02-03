@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Empresa {
+  id                String    @id @default(uuid())
+  cnpj              String    @unique
+  razaoSocial       String    @map("razao_social")
+  nomeFantasia      String?   @map("nome_fantasia")
+  inscricaoEstadual String?   @map("inscricao_estadual")
+  
+  // Endereco
+  logradouro        String?
+  numero            String?
+  complemento       String?
+  bairro            String?
+  cidade            String?
+  estado            String?
+  cep               String?
+
+  // Config
+  ambienteSefaz     String    @default("producao") @map("ambiente_sefaz") // producao, homologacao
+  ativo             Boolean   @default(true)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relacionamentos
+  usuarios          Usuario[]
+  notasFiscais      NotaFiscal[]
+  tags              Tag[]
+
+  @@map("empresas")
+}
+
+model Usuario {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  senhaHash       String    @map("senha_hash")
+  nome            String
+  cargo           String?
+  perfil          String    @default("operador") // admin, contador, operador
+  ativo           Boolean   @default(true)
+  ultimoAcesso    DateTime? @map("ultimo_acesso")
+  
+  empresaId       String    @map("empresa_id")
+  empresa         Empresa   @relation(fields: [empresaId], references: [id])
+  
+  manifestacoes   Manifestacao[]
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("usuarios")
+}
+
+model NotaFiscal {
+  id              String    @id @default(uuid())
+  chaveAcesso     String    @unique @map("chave_acesso")
+  numero          String
+  serie           String
+  tipo            String    // NFe, CTe
+  
+  // Valores
+  valorTotal      Decimal   @map("valor_total") @db.Decimal(15, 2)
+  valorProdutos   Decimal?  @map("valor_produtos") @db.Decimal(15, 2)
+  valorIcms       Decimal?  @map("valor_icms") @db.Decimal(15, 2)
+  
+  // Emitente
+  emitenteCnpj    String    @map("emitente_cnpj")
+  emitenteNome    String    @map("emitente_nome")
+  
+  // Status
+  statusSefaz          String   @default("autorizada") @map("status_sefaz")
+  statusManifestacao   String   @default("pendente") @map("status_manifestacao")
+  
+  dataEmissao          DateTime @map("data_emissao")
+  dataAutorizacao      DateTime? @map("data_autorizacao")
+  
+  empresaId       String    @map("empresa_id")
+  empresa         Empresa   @relation(fields: [empresaId], references: [id])
+  
+  manifestacoes   Manifestacao[]
+  tags            Tag[]     @relation("NotaTags")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  xmlConteudo     String?   @db.Text @map("xml_conteudo")
+
+  @@map("notas_fiscais")
+  @@index([empresaId])
+  @@index([dataEmissao])
+}
+
+model Manifestacao {
+  id              String    @id @default(uuid())
+  tipo            String    // ciencia, confirmacao, desconhecimento, nao_realizada
+  justificativa   String?
+  protocoloSefaz  String?   @map("protocolo_sefaz")
+  dataManifestacao DateTime @default(now()) @map("data_manifestacao")
+  
+  notaFiscalId    String    @map("nota_fiscal_id")
+  notaFiscal      NotaFiscal @relation(fields: [notaFiscalId], references: [id])
+  
+  usuarioId       String    @map("usuario_id")
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id])
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("manifestacoes")
+}
+
+model Tag {
+  id          String      @id @default(uuid())
+  nome        String
+  cor         String      @default("#000000")
+  
+  empresaId   String      @map("empresa_id")
+  empresa     Empresa     @relation(fields: [empresaId], references: [id])
+  
+  notasFiscais NotaFiscal[] @relation("NotaTags")
+  
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  @@map("tags")
+}

@@ -1,0 +1,13 @@
+{
+  "active": [
+    {
+      "slug": "authentication-plan",
+      "path": "plans/authentication-plan.md",
+      "title": "JWT Authentication System",
+      "linkedAt": "2026-02-03T00:23:15.520Z",
+      "status": "active"
+    }
+  ],
+  "completed": [],
+  "primary": "authentication-plan"
+}

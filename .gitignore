@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production build artifacts
+dist/
+*/dist/
+build/
+*/build/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!*.example.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Testing
+coverage/
+*/coverage/
+
+# Docker
+docker-compose.override.yml
+
+# AI Context (Optional - depending on if you want to share context)
+# .context/
+# But definitely ignore sensitive parts of it if any, usually .context is fine to commit 
+# unless it contains secrets. Assuming standard behavior for now.
+
+# Prisma
+# Ignore generated client if it's in a non-standard location, but usually it's in node_modules
+# Keep migrations
