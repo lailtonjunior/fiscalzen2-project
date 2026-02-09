@@ -46,12 +46,41 @@ import {
   Truck,
   MapPin
 } from 'lucide-react'
-import {
-  mockGraficoNotasPorMes,
-  mockGraficoValorPorMes,
-  mockGraficoStatusManifestacao,
-  mockGraficoTopFornecedores
-} from '@/data/mockData'
+// Dados para gráficos (Mock)
+const mockGraficoNotasPorMes = {
+  labels: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  datasets: [
+    { label: 'NFe', data: [245, 289, 312, 298, 267, 287], color: '#3b82f6' },
+    { label: 'CTe', data: [45, 52, 48, 61, 55, 49], color: '#8b5cf6' }
+  ]
+};
+
+const mockGraficoValorPorMes = {
+  labels: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  datasets: [
+    { label: 'Valor Total (R$)', data: [1850000, 2100000, 1950000, 2300000, 2150000, 987654], color: '#22c55e' }
+  ]
+};
+
+// const mockGraficoStatusManifestacao = ... (Used in Dashboard, not here? Wait, Relatorios DOES use it?)
+// Checking usage: Relatorios uses imports but let's check if it USES them.
+// It imports: mockGraficoNotasPorMes, mockGraficoValorPorMes, mockGraficoStatusManifestacao, mockGraficoTopFornecedores
+// Usage: 
+// <BarChart data={mockGraficoNotasPorMes...
+// <LineChart data={mockGraficoValorPorMes...
+// <PieChart data={dadosPorTipo... (Calculated from notas)
+// Wait! Relatorios calculates `dadosPorTipo` from `notas`, but ignores `mockGraficoStatusManifestacao`?
+// Let's check the file content I saw.
+// It uses `dadosPorTipo` for PieChart.
+// It uses `mockGraficoNotasPorMes` for BarChart.
+// It uses `mockGraficoValorPorMes` for LineChart.
+// It DOES NOT seem to use `mockGraficoStatusManifestacao` or `mockGraficoTopFornecedores` in the visible JSX logic I saw?
+// Wait, Top Fornecedores tab:
+// <BarChart data={topFornecedores.slice(0, 5)...
+// It calculates `topFornecedores` from `notas`.
+// So `Relatorios.tsx` only uses `mockGraficoNotasPorMes` and `mockGraficoValorPorMes`?
+// Let's verify.
+
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#22c55e', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#f97316']
 
@@ -65,7 +94,7 @@ export function Relatorios() {
   const totalValor = notas.reduce((acc, n) => acc + n.valorTotal, 0)
   const totalIcms = notas.reduce((acc, n) => acc + (n.valorIcms || 0), 0)
   const totalFrete = notas.reduce((acc, n) => acc + (n.valorFrete || 0), 0)
-  
+
   // Group by emitente
   const fornecedores = notas.reduce((acc, nota) => {
     const key = nota.emitenteCnpj
@@ -295,7 +324,7 @@ export function Relatorios() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart 
+                  <BarChart
                     data={topFornecedores.slice(0, 5).map((f: any) => ({
                       nome: f.nome.split(' ')[0],
                       valor: f.valor
@@ -479,7 +508,7 @@ export function Relatorios() {
                       <div className="flex items-center gap-3">
                         <Badge variant="outline">{item.uf}</Badge>
                         <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full bg-primary"
                             style={{ width: `${(item.quantidade / dadosPorUF[0].quantidade) * 100}%` }}
                           />

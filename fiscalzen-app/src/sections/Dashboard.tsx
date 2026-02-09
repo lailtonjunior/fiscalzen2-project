@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   BarChart,
@@ -28,27 +29,19 @@ import {
   TrendingUp,
   TrendingDown,
   Building2,
-  Download,
   DollarSign,
-  Clock,
   ArrowRight,
   RefreshCw,
-  Package,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Activity
 } from 'lucide-react'
-import {
-  mockGraficoNotasPorMes,
-  mockGraficoValorPorMes,
-  mockGraficoStatusManifestacao,
-  mockGraficoTopFornecedores
-} from '@/data/mockData'
 
 const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#a855f7', '#ef4444', '#f97316']
 
 export function Dashboard() {
   const navigate = useNavigate()
-  const { stats, periodo, setPeriodo, refreshStats } = useDashboardStore()
+  const { stats, minicharts, integrity, isLoading, periodo, setPeriodo, refreshStats } = useDashboardStore()
   const { notas } = useNotasStore()
   const { empresa } = useAuthStore()
 
@@ -68,6 +61,24 @@ export function Dashboard() {
 
   // Calculate usage percentage
   const usagePercent = empresa ? (empresa.notasUtilizadas / empresa.limiteNotas) * 100 : 0
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32" />)}
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Skeleton className="h-[400px]" />
+          <Skeleton className="h-[400px]" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -93,6 +104,21 @@ export function Dashboard() {
           </Button>
         </div>
       </div>
+
+      {/* Integrity Alert (Real Data) */}
+      {integrity && integrity.status !== 'HEALTHY' && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Atenção! </strong>
+          <span className="block sm:inline">Problema detectado na integridade do sistema.</span>
+        </div>
+      )}
+
+      {integrity && integrity.status === 'HEALTHY' && (
+        <div className="flex items-center gap-2 text-sm text-green-600 mb-2">
+          <Activity className="h-4 w-4" />
+          Sistema Operacional - Última verificação: {new Date(integrity.lastCheck).toLocaleTimeString()}
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -141,15 +167,15 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={mockGraficoNotasPorMes.labels.map((label, i) => ({
+              <BarChart data={minicharts.notasPorMes.labels.map((label: string, i: number) => ({
                 name: label,
-                NFe: mockGraficoNotasPorMes.datasets[0].data[i],
-                CTe: mockGraficoNotasPorMes.datasets[1].data[i]
+                NFe: minicharts.notasPorMes.datasets[0].data[i],
+                CTe: minicharts.notasPorMes.datasets[1].data[i]
               }))}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value: number) => [value.toLocaleString('pt-BR'), '']}
                   labelFormatter={(label) => `Mês: ${label}`}
                 />
@@ -171,9 +197,9 @@ export function Dashboard() {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={mockGraficoStatusManifestacao.labels.map((label, i) => ({
+                  data={minicharts.statusManifestacao.labels.map((label: string, i: number) => ({
                     name: getStatusLabel(label),
-                    value: mockGraficoStatusManifestacao.datasets[0].data[i]
+                    value: minicharts.statusManifestacao.datasets[0].data[i]
                   }))}
                   cx="50%"
                   cy="50%"
@@ -182,7 +208,7 @@ export function Dashboard() {
                   paddingAngle={2}
                   dataKey="value"
                 >
-                  {mockGraficoStatusManifestacao.datasets[0].data.map((_, i) => (
+                  {minicharts.statusManifestacao.datasets[0].data.map((_: any, i: number) => (
                     <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
@@ -204,23 +230,23 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={mockGraficoValorPorMes.labels.map((label, i) => ({
+              <LineChart data={minicharts.valorPorMes.labels.map((label: string, i: number) => ({
                 name: label,
-                valor: mockGraficoValorPorMes.datasets[0].data[i]
+                valor: minicharts.valorPorMes.datasets[0].data[i]
               }))}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis 
+                <YAxis
                   tickFormatter={(value) => `R$ ${(value / 1000000).toFixed(1)}M`}
                 />
-                <Tooltip 
+                <Tooltip
                   formatter={(value: number) => [formatCurrency(value), 'Valor']}
                   labelFormatter={(label) => `Mês: ${label}`}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="valor" 
-                  stroke="#22c55e" 
+                <Line
+                  type="monotone"
+                  dataKey="valor"
+                  stroke="#22c55e"
                   strokeWidth={2}
                   dot={{ fill: '#22c55e', strokeWidth: 2 }}
                 />
@@ -297,8 +323,8 @@ export function Dashboard() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-sm">{formatCurrency(nota.valorTotal)}</p>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={cn(
                         'text-xs',
                         nota.statusManifestacao === 'confirmada' && 'border-green-500 text-green-600',
@@ -360,9 +386,9 @@ export function Dashboard() {
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-sm">{formatCurrency(nota.valorTotal)}</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="text-xs h-7"
                         onClick={(e) => {
                           e.stopPropagation()
@@ -415,7 +441,7 @@ function StatCard({ title, value, description, trend, icon: Icon, trendLabel, al
           </div>
         </div>
         <div className="mt-4 flex items-center gap-2">
-          <Badge 
+          <Badge
             variant={trend >= 0 ? 'default' : 'destructive'}
             className="h-5 text-xs"
           >
