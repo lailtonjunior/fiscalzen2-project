@@ -1,26 +1,11 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import { Sidebar } from '@/components/custom/Sidebar'
 import { Header } from '@/components/custom/Header'
 import { cn } from '@/lib/utils'
-import { useUIStore } from '@/hooks/useStore'
-import { useAuthStore } from '@/stores/useAuthStore'
-import { useEffect } from 'react'
+import { useUIStore } from '@/stores/useUIStore'
 
 export function DashboardLayout() {
     const { sidebarOpen } = useUIStore()
-    const { isAuthenticated, checkAuth, isLoading } = useAuthStore()
-
-    useEffect(() => {
-        checkAuth()
-    }, [])
-
-    if (isLoading) {
-        return <div className="flex h-screen items-center justify-center">Carregando...</div>
-    }
-
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />
-    }
 
     return (
         <div className="min-h-screen bg-background text-foreground">

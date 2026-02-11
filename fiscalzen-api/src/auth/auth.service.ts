@@ -29,6 +29,15 @@ export class AuthService {
         };
     }
 
+    async getProfile(userId: string) {
+        const user = await this.usersService.findById(userId);
+        if (!user) {
+            throw new UnauthorizedException('Usuário não encontrado');
+        }
+        const { senhaHash, ...result } = user;
+        return result;
+    }
+
     async register(data: RegisterDto) {
         // Check if user exists
         const existingUser = await this.usersService.findOne(data.email);

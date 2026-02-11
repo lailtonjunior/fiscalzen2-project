@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore, useNotificacoesStore } from '@/hooks/useStore'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useNotificacoesStore } from '@/stores/useNotificacoesStore'
 import { cn, formatCNPJ } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,7 +36,8 @@ import {
   Info,
   X
 } from 'lucide-react'
-import type { Notificacao } from '@/types'
+
+
 
 interface HeaderProps {
   className?: string
@@ -54,7 +56,7 @@ export function Header({ className }: HeaderProps) {
     }
   }
 
-  const getNotificacaoIcon = (tipo: Notificacao['tipo']) => {
+  const getNotificacaoIcon = (tipo: string) => {
     switch (tipo) {
       case 'success':
         return <div className="w-2 h-2 rounded-full bg-green-500" />

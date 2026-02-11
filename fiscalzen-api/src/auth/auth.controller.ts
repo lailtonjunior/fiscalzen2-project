@@ -4,6 +4,7 @@ import { Public } from './public.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -11,6 +12,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
     @Public()
+    @Throttle({ short: { ttl: 60000, limit: 5 } })
     @ApiOperation({ summary: 'Login de usuário', description: 'Retorna token JWT para acesso.' })
     @ApiResponse({ status: 200, description: 'Login realizado com sucesso.' })
     @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
@@ -33,7 +35,7 @@ export class AuthController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Perfil do usuário', description: 'Retorna dados do usuário autenticado.' })
     @Get('profile')
-    getProfile(@Request() req: any) {
-        return req.user;
+    async getProfile(@Request() req: any) {
+        return this.authService.getProfile(req.user.userId);
     }
 }

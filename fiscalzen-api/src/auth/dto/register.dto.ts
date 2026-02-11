@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsCnpj } from '../../common/validators/cnpj.validator';
 
 export class RegisterDto {
     @ApiProperty({ example: 'João Silva', description: 'Nome completo do usuário' })
@@ -23,8 +24,8 @@ export class RegisterDto {
     @IsOptional()
     companyName?: string;
 
-    @ApiProperty({ example: '12345678000199', description: 'CNPJ da empresa (opcional)', required: false })
-    @IsString()
+    @ApiProperty({ example: '11222333000181', description: 'CNPJ da empresa (14 dígitos, opcional)', required: false })
     @IsOptional()
+    @IsCnpj()
     cnpj?: string;
 }

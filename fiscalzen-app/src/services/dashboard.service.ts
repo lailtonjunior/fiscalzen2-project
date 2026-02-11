@@ -1,4 +1,5 @@
 import { api } from './api';
+import type { DashboardStats } from '@/types';
 
 export interface DashboardTimelineItem {
     id: number;
@@ -14,6 +15,10 @@ export interface DashboardIntegrity {
 }
 
 export const dashboardService = {
+    getStats: async (periodo: string = '30d'): Promise<DashboardStats> => {
+        return api.get<any, DashboardStats>(`/dashboard/stats?periodo=${periodo}`);
+    },
+
     getTimeline: async (): Promise<DashboardTimelineItem[]> => {
         return api.get<any, DashboardTimelineItem[]>('/dashboard/timeline');
     },

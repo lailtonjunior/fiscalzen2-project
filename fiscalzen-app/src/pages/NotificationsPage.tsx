@@ -1,22 +1,15 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Bell, Check, Trash2, CheckCheck, FileText, AlertTriangle, Info } from 'lucide-react';
-
-interface Notification {
-    id: string;
-    tipo: 'info' | 'warning' | 'success' | 'error';
-    titulo: string;
-    mensagem: string;
-    lida: boolean;
-    createdAt: string;
-}
+import { Loader2, Bell, Check, Trash2, CheckCheck, AlertTriangle, Info, AlertCircle } from 'lucide-react';
+import { useNotificacoesStore } from '@/stores/useNotificacoesStore';
 
 const typeIcons: Record<string, React.ElementType> = {
     'info': Info,
+    'MANIFESTO_PENDENTE': AlertTriangle,
     'warning': AlertTriangle,
     'success': Check,
     'error': AlertTriangle,
@@ -24,65 +17,60 @@ const typeIcons: Record<string, React.ElementType> = {
 
 const typeColors: Record<string, string> = {
     'info': 'bg-blue-500',
+    'MANIFESTO_PENDENTE': 'bg-yellow-500',
     'warning': 'bg-yellow-500',
     'success': 'bg-green-500',
     'error': 'bg-red-500',
 };
 
-// Mock data
-const mockNotifications: Notification[] = [
-    { id: '1', tipo: 'success', titulo: 'NFe Autorizada', mensagem: 'A NFe 43210... foi autorizada com sucesso pela SEFAZ', lida: false, createdAt: '2026-02-09T00:45:00Z' },
-    { id: '2', tipo: 'warning', titulo: 'Certificado Expirando', mensagem: 'Seu certificado digital expira em 30 dias. Renove para continuar emitindo NFe.', lida: false, createdAt: '2026-02-09T00:30:00Z' },
-    { id: '3', tipo: 'info', titulo: 'Nova Manifestação', mensagem: '5 novas notas fiscais disponíveis para manifestação', lida: true, createdAt: '2026-02-08T23:15:00Z' },
-    { id: '4', tipo: 'error', titulo: 'Falha na Transmissão', mensagem: 'Erro ao transmitir NFe 43209... Verifique os dados e tente novamente.', lida: true, createdAt: '2026-02-08T22:00:00Z' },
-];
-
 export function NotificationsPage() {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [loading, setLoading] = useState(true);
+    const {
+        notificacoes,
+        unreadCount,
+        loading,
+        error,
+        fetchNotificacoes,
+        fetchUnreadCount,
+        markAsRead,
+        markAllAsRead,
+        removeNotificacao,
+    } = useNotificacoesStore();
     const [onlyUnread, setOnlyUnread] = useState(false);
 
     useEffect(() => {
-        loadNotifications();
-    }, []);
+        fetchNotificacoes();
+        fetchUnreadCount();
+    }, [fetchNotificacoes, fetchUnreadCount]);
 
-    const loadNotifications = async () => {
+    const handleMarkAsRead = async (id: string) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            setNotifications(mockNotifications);
+            await markAsRead(id);
         } catch {
-            toast.error('Erro ao carregar notificações');
-        } finally {
-            setLoading(false);
+            toast.error('Erro ao marcar como lida');
         }
     };
 
-    const markAsRead = (id: string) => {
-        setNotifications(notifications.map(n =>
-            n.id === id ? { ...n, lida: true } : n
-        ));
+    const handleMarkAllAsRead = async () => {
+        try {
+            await markAllAsRead();
+            toast.success('Todas as notificações marcadas como lidas');
+        } catch {
+            toast.error('Erro ao marcar todas como lidas');
+        }
     };
 
-    const markAllAsRead = () => {
-        setNotifications(notifications.map(n => ({ ...n, lida: true })));
-        toast.success('Todas as notificações marcadas como lidas');
-    };
-
-    const deleteNotification = (id: string) => {
-        setNotifications(notifications.filter(n => n.id !== id));
-        toast.success('Notificação removida');
-    };
-
-    const clearAll = () => {
-        setNotifications([]);
-        toast.success('Todas as notificações removidas');
+    const handleDelete = async (id: string) => {
+        try {
+            await removeNotificacao(id);
+            toast.success('Notificação removida');
+        } catch {
+            toast.error('Erro ao remover notificação');
+        }
     };
 
     const filteredNotifications = onlyUnread
-        ? notifications.filter(n => !n.lida)
-        : notifications;
-
-    const unreadCount = notifications.filter(n => !n.lida).length;
+        ? notificacoes.filter(n => !n.lida)
+        : notificacoes;
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -94,10 +82,20 @@ export function NotificationsPage() {
         return date.toLocaleDateString('pt-BR');
     };
 
-    if (loading) {
+    if (loading && notificacoes.length === 0) {
         return (
             <div className="flex items-center justify-center h-[50vh]">
                 <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+                <p className="text-destructive">{error}</p>
+                <Button onClick={() => fetchNotificacoes()}>Tentar novamente</Button>
             </div>
         );
     }
@@ -113,15 +111,9 @@ export function NotificationsPage() {
                 </div>
                 <div className="flex gap-2">
                     {unreadCount > 0 && (
-                        <Button variant="outline" onClick={markAllAsRead}>
+                        <Button variant="outline" onClick={handleMarkAllAsRead}>
                             <CheckCheck className="mr-2 h-4 w-4" />
                             Marcar todas como lidas
-                        </Button>
-                    )}
-                    {notifications.length > 0 && (
-                        <Button variant="outline" onClick={clearAll}>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Limpar
                         </Button>
                     )}
                 </div>
@@ -153,7 +145,8 @@ export function NotificationsPage() {
                     </Card>
                 ) : (
                     filteredNotifications.map((notification) => {
-                        const Icon = typeIcons[notification.tipo];
+                        const Icon = typeIcons[notification.tipo] || Info;
+                        const bgColor = typeColors[notification.tipo] || 'bg-blue-500';
                         return (
                             <Card
                                 key={notification.id}
@@ -161,7 +154,7 @@ export function NotificationsPage() {
                             >
                                 <CardContent className="py-4">
                                     <div className="flex items-start gap-4">
-                                        <div className={`p-2 rounded-full ${typeColors[notification.tipo]}`}>
+                                        <div className={`p-2 rounded-full ${bgColor}`}>
                                             <Icon className="h-4 w-4 text-white" />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -183,7 +176,7 @@ export function NotificationsPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => markAsRead(notification.id)}
+                                                    onClick={() => handleMarkAsRead(notification.id)}
                                                     title="Marcar como lida"
                                                 >
                                                     <Check className="h-4 w-4" />
@@ -192,7 +185,7 @@ export function NotificationsPage() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => deleteNotification(notification.id)}
+                                                onClick={() => handleDelete(notification.id)}
                                                 title="Remover"
                                             >
                                                 <Trash2 className="h-4 w-4" />

@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DashboardService {
-    async getTimeline() {
-        // Mock data for initial frontend integration
+    async getTimeline(empresaId: string) {
+        // TODO: Replace with real data filtered by empresaId
         return [
             { id: 1, type: 'NFE_RECEIVED', message: 'Nota Fiscal recebida de Google Brasil', date: new Date().toISOString() },
             { id: 2, type: 'TAX_CALCULATED', message: 'Impostos calculados para o mês atual', date: new Date(Date.now() - 86400000).toISOString() },
@@ -11,8 +11,8 @@ export class DashboardService {
         ];
     }
 
-    async getIntegrity() {
-        // Mock data for integrity check
+    async getIntegrity(empresaId: string) {
+        // TODO: Replace with real checks scoped to empresaId
         return {
             status: 'HEALTHY',
             checks: [

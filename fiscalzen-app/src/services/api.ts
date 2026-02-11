@@ -31,8 +31,10 @@ api.interceptors.response.use(
         // Auth Errors
         if (error.response?.status === 401) {
             toast.error('Sessão expirada. Faça login novamente.');
-            localStorage.removeItem('auth_token');
-            // Optional: Redirect to login if window.location is available (or handle in store)
+            // Dynamic import to avoid circular dependency (api → auth.service → useAuthStore → api)
+            import('@/stores/useAuthStore').then(({ useAuthStore }) => {
+                useAuthStore.getState().logout();
+            });
             if (window.location.pathname !== '/login') {
                 window.location.href = '/login';
             }

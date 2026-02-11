@@ -1,72 +1,70 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, History, Search, FileText, User, Building2, Settings } from 'lucide-react';
-
-interface LogEntry {
-    id: string;
-    acao: string;
-    entidade: string;
-    entidadeId: string;
-    usuario: string;
-    detalhes: string;
-    ip: string;
-    createdAt: string;
-}
+import { Loader2, History, Search, FileText, User, Building2, Settings, AlertCircle } from 'lucide-react';
+import { historicoService, type AuditLog, type HistoricoFilters } from '@/services/historico.service';
 
 const actionIcons: Record<string, React.ElementType> = {
     'nfe': FileText,
+    'nota_fiscal': FileText,
     'usuario': User,
     'empresa': Building2,
     'config': Settings,
+    'fornecedor': Building2,
+    'tag': Settings,
 };
 
 const actionColors: Record<string, string> = {
     'criar': 'bg-green-500',
+    'create': 'bg-green-500',
     'editar': 'bg-blue-500',
+    'update': 'bg-blue-500',
     'excluir': 'bg-red-500',
+    'delete': 'bg-red-500',
     'login': 'bg-purple-500',
     'logout': 'bg-gray-500',
+    'manifestar': 'bg-yellow-500',
+    'importar': 'bg-blue-400',
 };
 
-// Mock data
-const mockLogs: LogEntry[] = [
-    { id: '1', acao: 'criar', entidade: 'nfe', entidadeId: '43210...', usuario: 'João Silva', detalhes: 'NFe emitida com sucesso', ip: '192.168.1.100', createdAt: '2026-02-09T00:45:00Z' },
-    { id: '2', acao: 'login', entidade: 'usuario', entidadeId: '-', usuario: 'Maria Santos', detalhes: 'Login realizado', ip: '192.168.1.101', createdAt: '2026-02-09T00:30:00Z' },
-    { id: '3', acao: 'editar', entidade: 'empresa', entidadeId: 'EMP001', usuario: 'João Silva', detalhes: 'Dados da empresa atualizados', ip: '192.168.1.100', createdAt: '2026-02-08T23:15:00Z' },
-    { id: '4', acao: 'criar', entidade: 'usuario', entidadeId: 'USR003', usuario: 'Admin', detalhes: 'Novo usuário cadastrado: Pedro', ip: '192.168.1.1', createdAt: '2026-02-08T22:00:00Z' },
-    { id: '5', acao: 'excluir', entidade: 'nfe', entidadeId: '43209...', usuario: 'Maria Santos', detalhes: 'NFe cancelada', ip: '192.168.1.101', createdAt: '2026-02-08T21:30:00Z' },
-];
-
 export function HistoryPage() {
-    const [logs, setLogs] = useState<LogEntry[]>([]);
+    const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterAction, setFilterAction] = useState<string>('all');
 
     useEffect(() => {
         loadLogs();
-    }, []);
+    }, [filterAction]);
 
     const loadLogs = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            setLogs(mockLogs);
-        } catch {
-            console.error('Erro ao carregar histórico');
+            const filters: HistoricoFilters = { take: 50 };
+            if (filterAction !== 'all') filters.acao = filterAction;
+            const result = await historicoService.getAll(filters);
+            setLogs(result.data);
+        } catch (err: any) {
+            setError(err?.response?.data?.message || 'Erro ao carregar histórico');
         } finally {
             setLoading(false);
         }
     };
 
     const filteredLogs = logs.filter(log => {
-        const matchesSearch = log.usuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.detalhes.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filterAction === 'all' || log.acao === filterAction;
-        return matchesSearch && matchesFilter;
+        if (!searchTerm) return true;
+        const term = searchTerm.toLowerCase();
+        return (
+            log.entidade?.toLowerCase().includes(term) ||
+            log.acao?.toLowerCase().includes(term) ||
+            log.entidadeId?.toLowerCase().includes(term)
+        );
     });
 
     const formatDate = (dateStr: string) => {
@@ -88,6 +86,16 @@ export function HistoryPage() {
         );
     }
 
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+                <p className="text-destructive">{error}</p>
+                <Button onClick={loadLogs}>Tentar novamente</Button>
+            </div>
+        );
+    }
+
     return (
         <div className="container mx-auto py-6 space-y-6">
             <div>
@@ -100,7 +108,7 @@ export function HistoryPage() {
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Buscar por usuário ou descrição..."
+                        placeholder="Buscar por entidade ou descrição..."
                         className="pl-10"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -112,11 +120,12 @@ export function HistoryPage() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">Todas as ações</SelectItem>
-                        <SelectItem value="criar">Criar</SelectItem>
-                        <SelectItem value="editar">Editar</SelectItem>
-                        <SelectItem value="excluir">Excluir</SelectItem>
+                        <SelectItem value="create">Criar</SelectItem>
+                        <SelectItem value="update">Editar</SelectItem>
+                        <SelectItem value="delete">Excluir</SelectItem>
                         <SelectItem value="login">Login</SelectItem>
-                        <SelectItem value="logout">Logout</SelectItem>
+                        <SelectItem value="manifestar">Manifestar</SelectItem>
+                        <SelectItem value="importar">Importar</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -135,8 +144,8 @@ export function HistoryPage() {
                             <TableRow>
                                 <TableHead>Data/Hora</TableHead>
                                 <TableHead>Ação</TableHead>
-                                <TableHead>Usuário</TableHead>
-                                <TableHead>Descrição</TableHead>
+                                <TableHead>Entidade</TableHead>
+                                <TableHead>ID</TableHead>
                                 <TableHead>IP</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -150,27 +159,28 @@ export function HistoryPage() {
                             ) : (
                                 filteredLogs.map((log) => {
                                     const Icon = actionIcons[log.entidade] || History;
+                                    const colorKey = log.acao?.toLowerCase() || '';
                                     return (
                                         <TableRow key={log.id}>
                                             <TableCell className="font-mono text-sm">
                                                 {formatDate(log.createdAt)}
                                             </TableCell>
                                             <TableCell>
-                                                <Badge className={`${actionColors[log.acao]} text-white`}>
-                                                    {log.acao.charAt(0).toUpperCase() + log.acao.slice(1)}
+                                                <Badge className={`${actionColors[colorKey] || 'bg-gray-500'} text-white`}>
+                                                    {log.acao}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
                                                     <Icon className="h-4 w-4 text-muted-foreground" />
-                                                    {log.usuario}
+                                                    {log.entidade}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="max-w-[300px] truncate">
-                                                {log.detalhes}
+                                            <TableCell className="max-w-[200px] truncate font-mono text-sm">
+                                                {log.entidadeId || '-'}
                                             </TableCell>
                                             <TableCell className="font-mono text-sm text-muted-foreground">
-                                                {log.ip}
+                                                {log.ipOrigem || '-'}
                                             </TableCell>
                                         </TableRow>
                                     );

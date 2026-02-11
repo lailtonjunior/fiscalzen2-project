@@ -16,13 +16,15 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsersService } from './users.service';
 import type { CreateUserDto, UpdateUserDto } from './users.service';
 
+import { RolesGuard, Roles } from '../auth/roles.guard';
+
 interface AuthenticatedRequest {
     user: { sub: string; email: string };
 }
 
 @ApiTags('users')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
@@ -58,6 +60,7 @@ export class UsersController {
             },
         },
     })
+    @Roles('admin')
     async createUser(
         @Request() req: AuthenticatedRequest,
         @Body() dto: Omit<CreateUserDto, 'empresaId'>,
@@ -85,6 +88,7 @@ export class UsersController {
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Deactivate user' })
+    @Roles('admin')
     async deactivateUser(
         @Request() req: AuthenticatedRequest,
         @Param('id') id: string,

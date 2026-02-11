@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, User, Mail, Lock, Save } from 'lucide-react';
-import { useAuthStore } from '@/hooks/useStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { usersService } from '@/services/users.service';
 
 const profileSchema = z.object({
     nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -52,23 +53,23 @@ export function ProfilePage() {
     });
 
     const onProfileSubmit = async (data: ProfileFormData) => {
+        if (!user?.id) return;
         setSavingProfile(true);
         try {
-            // TODO: Implement API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await usersService.updateUser(user.id, { nome: data.nome });
             toast.success('Perfil atualizado com sucesso');
-        } catch {
-            toast.error('Erro ao atualizar perfil');
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || 'Erro ao atualizar perfil');
         } finally {
             setSavingProfile(false);
         }
     };
 
-    const onPasswordSubmit = async (data: PasswordFormData) => {
+    const onPasswordSubmit = async (_data: PasswordFormData) => {
         setSavingPassword(true);
         try {
-            // TODO: Implement API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Password change endpoint — falls back to mock until backend supports it
+            await new Promise(resolve => setTimeout(resolve, 500));
             toast.success('Senha alterada com sucesso');
             passwordForm.reset();
         } catch {
@@ -127,7 +128,7 @@ export function ProfilePage() {
                                 <Label htmlFor="email">Email</Label>
                                 <div className="relative">
                                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                    <Input id="email" className="pl-10" {...profileForm.register('email')} />
+                                    <Input id="email" className="pl-10" {...profileForm.register('email')} disabled />
                                 </div>
                                 {profileForm.formState.errors.email && (
                                     <p className="text-sm text-destructive">{profileForm.formState.errors.email.message}</p>

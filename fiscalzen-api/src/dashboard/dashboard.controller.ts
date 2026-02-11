@@ -1,11 +1,9 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DashboardService } from './dashboard.service';
 
 @ApiTags('Dashboard')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('dashboard')
 export class DashboardController {
     constructor(private readonly dashboardService: DashboardService) { }
@@ -13,14 +11,14 @@ export class DashboardController {
     @Get('timeline')
     @ApiOperation({ summary: 'Obter linha do tempo de eventos' })
     @ApiResponse({ status: 200, description: 'Lista de eventos recentes.' })
-    async getTimeline() {
-        return this.dashboardService.getTimeline();
+    async getTimeline(@Request() req: any) {
+        return this.dashboardService.getTimeline(req.user.empresaId);
     }
 
     @Get('integrity')
     @ApiOperation({ summary: 'Verificar integridade do sistema' })
     @ApiResponse({ status: 200, description: 'Status de saúde dos serviços.' })
-    async getIntegrity() {
-        return this.dashboardService.getIntegrity();
+    async getIntegrity(@Request() req: any) {
+        return this.dashboardService.getIntegrity(req.user.empresaId);
     }
 }

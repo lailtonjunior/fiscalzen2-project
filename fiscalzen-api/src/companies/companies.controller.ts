@@ -16,13 +16,15 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CompaniesService } from './companies.service';
 import { UpdateCompanyDto } from './dto';
 
+import { RolesGuard, Roles } from '../auth/roles.guard';
+
 interface AuthenticatedRequest {
     user: { sub: string; email: string };
 }
 
 @ApiTags('companies')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('companies')
 export class CompaniesController {
     constructor(private readonly companiesService: CompaniesService) { }
@@ -34,6 +36,7 @@ export class CompaniesController {
     }
 
     @Put('me')
+    @Roles('admin')
     @ApiOperation({ summary: 'Update current user company data' })
     async updateMyCompany(
         @Request() req: AuthenticatedRequest,
@@ -63,6 +66,7 @@ export class CompaniesController {
         },
     })
     @UseInterceptors(FileInterceptor('file'))
+    @Roles('admin')
     async uploadCertificate(
         @Request() req: AuthenticatedRequest,
         @UploadedFile() file: Express.Multer.File,

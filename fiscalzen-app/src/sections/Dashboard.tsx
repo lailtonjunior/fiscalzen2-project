@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDashboardStore, useNotasStore, useAuthStore } from '@/hooks/useStore'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useDashboardStore } from '@/stores/useDashboardStore'
+import { useNotasStore } from '@/stores/useNotasStore'
 import { cn, formatCurrency, formatDate, getStatusLabel } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,21 +10,6 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  Legend
-} from 'recharts'
 import {
   FileText,
   AlertTriangle,
@@ -37,13 +24,17 @@ import {
   Activity
 } from 'lucide-react'
 
-const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#a855f7', '#ef4444', '#f97316']
 
 export function Dashboard() {
   const navigate = useNavigate()
-  const { stats, minicharts, integrity, isLoading, periodo, setPeriodo, refreshStats } = useDashboardStore()
-  const { notas } = useNotasStore()
+  const { stats, integrity, isLoading, error, periodo, setPeriodo, refreshStats } = useDashboardStore()
+  const { notas, fetchNotas } = useNotasStore()
   const { empresa } = useAuthStore()
+
+  useEffect(() => {
+    refreshStats()
+    fetchNotas({ take: 20, statusManifestacao: undefined })
+  }, [])
 
   useEffect(() => {
     refreshStats()
@@ -60,9 +51,11 @@ export function Dashboard() {
     .slice(0, 5)
 
   // Calculate usage percentage
-  const usagePercent = empresa ? (empresa.notasUtilizadas / empresa.limiteNotas) * 100 : 0
+  const notasUtilizadas = (empresa as any)?.notasUtilizadas ?? 0
+  const limiteNotas = (empresa as any)?.limiteNotas ?? 1
+  const usagePercent = empresa ? (notasUtilizadas / limiteNotas) * 100 : 0
 
-  if (isLoading) {
+  if (isLoading && stats.totalNotas === 0) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -76,6 +69,20 @@ export function Dashboard() {
           <Skeleton className="h-[400px]" />
           <Skeleton className="h-[400px]" />
         </div>
+      </div>
+    )
+  }
+
+  if (error && stats.totalNotas === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+        <AlertCircle className="h-16 w-16 mb-4 text-red-400" />
+        <p className="text-lg font-medium">Falha ao carregar dashboard</p>
+        <p className="text-sm mb-4">{error}</p>
+        <Button onClick={() => refreshStats()}>
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Tentar novamente
+        </Button>
       </div>
     )
   }
@@ -157,101 +164,45 @@ export function Dashboard() {
         />
       </div>
 
-      {/* Charts Row */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Notas por Mês */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Notas por Tipo</CardTitle>
-            <CardDescription>Distribuição de NFe e CTe nos últimos 6 meses</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={minicharts.notasPorMes.labels.map((label: string, i: number) => ({
-                name: label,
-                NFe: minicharts.notasPorMes.datasets[0].data[i],
-                CTe: minicharts.notasPorMes.datasets[1].data[i]
-              }))}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip
-                  formatter={(value: number) => [value.toLocaleString('pt-BR'), '']}
-                  labelFormatter={(label) => `Mês: ${label}`}
-                />
-                <Legend />
-                <Bar dataKey="NFe" fill="#3b82f6" />
-                <Bar dataKey="CTe" fill="#8b5cf6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Status Manifestação */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Status de Manifestação</CardTitle>
-            <CardDescription>Distribuição das manifestações do destinatário</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={minicharts.statusManifestacao.labels.map((label: string, i: number) => ({
-                    name: getStatusLabel(label),
-                    value: minicharts.statusManifestacao.datasets[0].data[i]
-                  }))}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {minicharts.statusManifestacao.datasets[0].data.map((_: any, i: number) => (
-                    <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => [value.toLocaleString('pt-BR'), 'Quantidade']} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Second Row Charts */}
+      {/* Summary Cards Row */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Valor por Mês */}
-        <Card className="lg:col-span-2">
+        {/* Status Manifestação Summary */}
+        <Card>
           <CardHeader>
-            <CardTitle>Valor Total por Mês</CardTitle>
-            <CardDescription>Evolução do valor das notas nos últimos 6 meses</CardDescription>
+            <CardTitle>Manifestações</CardTitle>
+            <CardDescription>Resumo do status das manifestações</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={minicharts.valorPorMes.labels.map((label: string, i: number) => ({
-                name: label,
-                valor: minicharts.valorPorMes.datasets[0].data[i]
-              }))}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis
-                  tickFormatter={(value) => `R$ ${(value / 1000000).toFixed(1)}M`}
-                />
-                <Tooltip
-                  formatter={(value: number) => [formatCurrency(value), 'Valor']}
-                  labelFormatter={(label) => `Mês: ${label}`}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="valor"
-                  stroke="#22c55e"
-                  strokeWidth={2}
-                  dot={{ fill: '#22c55e', strokeWidth: 2 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Manifestadas</span>
+              <span className="font-medium text-green-600">{stats.notasManifestadas.toLocaleString('pt-BR')}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Pendentes</span>
+              <span className="font-medium text-yellow-600">{stats.notasPendentesManifestacao.toLocaleString('pt-BR')}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Downloads</span>
+              <span className="font-medium">{stats.downloadsRealizados?.toLocaleString('pt-BR') ?? 0}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Valores Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Valores</CardTitle>
+            <CardDescription>Totais acumulados e do mês</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Total acumulado</span>
+              <span className="font-medium">{formatCurrency(stats.valorTotalNotas)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Este mês</span>
+              <span className="font-medium text-green-600">{formatCurrency(stats.valorTotalMes)}</span>
+            </div>
           </CardContent>
         </Card>
 
@@ -265,7 +216,7 @@ export function Dashboard() {
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Utilizado</span>
               <span className="font-medium">
-                {empresa?.notasUtilizadas.toLocaleString('pt-BR')} / {empresa?.limiteNotas.toLocaleString('pt-BR')}
+                {notasUtilizadas.toLocaleString('pt-BR')} / {limiteNotas.toLocaleString('pt-BR')}
               </span>
             </div>
             <Progress value={usagePercent} className="h-2" />

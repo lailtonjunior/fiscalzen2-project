@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNotasStore } from '@/hooks/useStore'
+import { useNotasStore } from '@/stores/useNotasStore'
+import { notasFiscaisService } from '@/services/notas-fiscais.service'
+import type { ManifestarDto } from '@/services/notas-fiscais.service'
 import { cn, formatCurrency, formatDate, formatCNPJCPF, getStatusLabel } from '@/lib/utils'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -41,17 +44,23 @@ import {
 
 export function Manifestacao() {
   const navigate = useNavigate()
-  const { notas, atualizarStatusManifestacao, notasSelecionadas, toggleNotaSelecionada, limparSelecao } = useNotasStore()
-  
+  const { notas, fetchNotas, notasSelecionadas, toggleNotaSelecionada, limparSelecao, loading } = useNotasStore()
+
   const [showManifestacaoDialog, setShowManifestacaoDialog] = useState(false)
   const [selectedNotaId, setSelectedNotaId] = useState<string | null>(null)
   const [manifestacaoTipo, setManifestacaoTipo] = useState<string>('')
   const [justificativa, setJustificativa] = useState('')
   const [batchMode, setBatchMode] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
+
+  // Fetch notas on mount
+  useEffect(() => {
+    fetchNotas()
+  }, [])
 
   // Get notas pendentes
   const notasPendentes = notas.filter(n => n.statusManifestacao === 'pendente')
-  
+
   // Get notas manifestadas recentemente
   const notasManifestadas = notas
     .filter(n => n.statusManifestacao !== 'pendente')
@@ -76,17 +85,31 @@ export function Manifestacao() {
     setShowManifestacaoDialog(true)
   }
 
-  const confirmManifestacao = () => {
-    if (batchMode && notasSelecionadas.length > 0) {
-      notasSelecionadas.forEach(id => {
-        atualizarStatusManifestacao(id, manifestacaoTipo)
-      })
-      limparSelecao()
-    } else if (selectedNotaId) {
-      atualizarStatusManifestacao(selectedNotaId, manifestacaoTipo)
+  const confirmManifestacao = async () => {
+    setActionLoading(true)
+    try {
+      const dto: ManifestarDto = {
+        tipo: manifestacaoTipo as ManifestarDto['tipo'],
+        justificativa: justificativa.trim() || undefined,
+      }
+      if (batchMode && notasSelecionadas.length > 0) {
+        await Promise.all(
+          notasSelecionadas.map(id => notasFiscaisService.manifestar(id, dto))
+        )
+        toast.success(`${notasSelecionadas.length} manifestações registradas com sucesso`)
+        limparSelecao()
+      } else if (selectedNotaId) {
+        await notasFiscaisService.manifestar(selectedNotaId, dto)
+        toast.success('Manifestação registrada com sucesso')
+      }
+      await fetchNotas()
+    } catch (err) {
+      toast.error('Falha ao registrar manifestação')
+    } finally {
+      setActionLoading(false)
+      setShowManifestacaoDialog(false)
+      setJustificativa('')
     }
-    setShowManifestacaoDialog(false)
-    setJustificativa('')
   }
 
   const getManifestacaoIcon = (tipo: string) => {
@@ -147,8 +170,8 @@ export function Manifestacao() {
             <div>
               <h4 className="font-medium text-blue-900">Sobre a Manifestação do Destinatário</h4>
               <p className="text-sm text-blue-800 mt-1">
-                A manifestação do destinatário é obrigatória para notas fiscais emitidas contra seu CNPJ. 
-                Você tem até <strong>180 dias</strong> a partir da data de emissão para realizar a manifestação. 
+                A manifestação do destinatário é obrigatória para notas fiscais emitidas contra seu CNPJ.
+                Você tem até <strong>180 dias</strong> a partir da data de emissão para realizar a manifestação.
                 Após este prazo, a nota não poderá mais ser manifestada.
               </p>
             </div>
@@ -216,7 +239,7 @@ export function Manifestacao() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
-              <Button 
+              <Button
                 onClick={() => {
                   const primeiraPendente = notasPendentes[0]
                   if (primeiraPendente) {
@@ -227,7 +250,7 @@ export function Manifestacao() {
                 <HelpCircle className="mr-2 h-4 w-4" />
                 Dar Ciência da Primeira
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   const primeiraPendente = notasPendentes[0]
@@ -239,7 +262,7 @@ export function Manifestacao() {
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Confirmar Operação
               </Button>
-              <Button 
+              <Button
                 variant="secondary"
                 onClick={() => navigate('/notas-fiscais?manifestacao=pendente')}
               >
@@ -308,7 +331,7 @@ export function Manifestacao() {
                       <TableCell>{formatDate(nota.dataEmissao)}</TableCell>
                       <TableCell>{formatCurrency(nota.valorTotal)}</TableCell>
                       <TableCell>
-                        <Badge 
+                        <Badge
                           variant={diasRestantes < 30 ? 'destructive' : diasRestantes < 60 ? 'default' : 'secondary'}
                         >
                           {diasRestantes} dias
@@ -316,14 +339,14 @@ export function Manifestacao() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => handleManifestacao(nota.id, 'ciencia')}
                           >
                             <HelpCircle className="h-4 w-4" />
                           </Button>
-                          <Button 
+                          <Button
                             size="sm"
                             onClick={() => handleManifestacao(nota.id, 'confirmada')}
                           >
@@ -438,7 +461,7 @@ export function Manifestacao() {
                 <div>
                   <h4 className="font-medium text-yellow-900">Atenção</h4>
                   <p className="text-sm text-yellow-800">
-                    Após confirmada, a manifestação não poderá ser alterada. 
+                    Após confirmada, a manifestação não poderá ser alterada.
                     Certifique-se de que as informações estão corretas antes de prosseguir.
                   </p>
                 </div>
@@ -450,7 +473,7 @@ export function Manifestacao() {
             <Button variant="outline" onClick={() => setShowManifestacaoDialog(false)}>
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={confirmManifestacao}
               disabled={
                 (manifestacaoTipo === 'desconhecida' || manifestacaoTipo === 'nao_realizada' || manifestacaoTipo === 'desacordo') &&

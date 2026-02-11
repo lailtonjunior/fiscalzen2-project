@@ -7,14 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Loader2, Plus, MoreHorizontal, Tags, Pencil, Trash2 } from 'lucide-react';
-
-interface Tag {
-    id: string;
-    nome: string;
-    cor: string;
-    contagem: number;
-}
+import { Loader2, Plus, MoreHorizontal, Tags, Pencil, Trash2, AlertCircle } from 'lucide-react';
+import { useTagsStore } from '@/stores/useTagsStore';
 
 const COLORS = [
     { name: 'Vermelho', value: '#ef4444' },
@@ -27,38 +21,17 @@ const COLORS = [
     { name: 'Cinza', value: '#6b7280' },
 ];
 
-// Mock data
-const mockTags: Tag[] = [
-    { id: '1', nome: 'Urgente', cor: '#ef4444', contagem: 12 },
-    { id: '2', nome: 'Pendente', cor: '#f97316', contagem: 8 },
-    { id: '3', nome: 'Revisado', cor: '#22c55e', contagem: 45 },
-    { id: '4', nome: 'Arquivado', cor: '#6b7280', contagem: 120 },
-];
-
 export function TagsPage() {
-    const [tags, setTags] = useState<Tag[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { tags, loading, error, fetchTags, addTag, updateTag, removeTag } = useTagsStore();
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [editingTag, setEditingTag] = useState<Tag | null>(null);
+    const [editingTagId, setEditingTagId] = useState<string | null>(null);
     const [newTagName, setNewTagName] = useState('');
     const [newTagColor, setNewTagColor] = useState(COLORS[0].value);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        loadTags();
-    }, []);
-
-    const loadTags = async () => {
-        try {
-            // TODO: Replace with API call
-            await new Promise(resolve => setTimeout(resolve, 500));
-            setTags(mockTags);
-        } catch {
-            toast.error('Erro ao carregar tags');
-        } finally {
-            setLoading(false);
-        }
-    };
+        fetchTags();
+    }, [fetchTags]);
 
     const handleSave = async () => {
         if (!newTagName.trim()) {
@@ -68,22 +41,13 @@ export function TagsPage() {
 
         setSaving(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            if (editingTag) {
-                setTags(tags.map(t => t.id === editingTag.id ? { ...t, nome: newTagName, cor: newTagColor } : t));
+            if (editingTagId) {
+                await updateTag(editingTagId, { nome: newTagName, cor: newTagColor });
                 toast.success('Tag atualizada');
             } else {
-                const newTag: Tag = {
-                    id: Date.now().toString(),
-                    nome: newTagName,
-                    cor: newTagColor,
-                    contagem: 0,
-                };
-                setTags([...tags, newTag]);
+                await addTag(newTagName, newTagColor);
                 toast.success('Tag criada');
             }
-
             resetForm();
         } catch {
             toast.error('Erro ao salvar tag');
@@ -94,32 +58,41 @@ export function TagsPage() {
 
     const handleDelete = async (id: string) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
-            setTags(tags.filter(t => t.id !== id));
+            await removeTag(id);
             toast.success('Tag removida');
         } catch {
             toast.error('Erro ao remover tag');
         }
     };
 
-    const openEditDialog = (tag: Tag) => {
-        setEditingTag(tag);
+    const openEditDialog = (tag: { id: string; nome: string; cor: string }) => {
+        setEditingTagId(tag.id);
         setNewTagName(tag.nome);
         setNewTagColor(tag.cor);
         setDialogOpen(true);
     };
 
     const resetForm = () => {
-        setEditingTag(null);
+        setEditingTagId(null);
         setNewTagName('');
         setNewTagColor(COLORS[0].value);
         setDialogOpen(false);
     };
 
-    if (loading) {
+    if (loading && tags.length === 0) {
         return (
             <div className="flex items-center justify-center h-[50vh]">
                 <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+                <p className="text-destructive">{error}</p>
+                <Button onClick={() => fetchTags()}>Tentar novamente</Button>
             </div>
         );
     }
@@ -141,9 +114,9 @@ export function TagsPage() {
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>{editingTag ? 'Editar Tag' : 'Nova Tag'}</DialogTitle>
+                            <DialogTitle>{editingTagId ? 'Editar Tag' : 'Nova Tag'}</DialogTitle>
                             <DialogDescription>
-                                {editingTag ? 'Atualize o nome e a cor da tag' : 'Crie uma nova tag para organizar suas notas'}
+                                {editingTagId ? 'Atualize o nome e a cor da tag' : 'Crie uma nova tag para organizar suas notas'}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -188,7 +161,7 @@ export function TagsPage() {
                             <Button variant="outline" onClick={resetForm}>Cancelar</Button>
                             <Button onClick={handleSave} disabled={saving}>
                                 {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {editingTag ? 'Salvar' : 'Criar'}
+                                {editingTagId ? 'Salvar' : 'Criar'}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -227,7 +200,7 @@ export function TagsPage() {
                                                 {tag.nome}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell>{tag.contagem} nota(s)</TableCell>
+                                        <TableCell>{tag._count?.notasFiscais ?? 0} nota(s)</TableCell>
                                         <TableCell>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>

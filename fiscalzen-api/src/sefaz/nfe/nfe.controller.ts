@@ -6,7 +6,6 @@ import {
     Param,
     Request,
     Res,
-    UseGuards,
     Logger,
     HttpStatus,
     HttpCode,
@@ -15,7 +14,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiProduce
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import type { Response } from 'express';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { Throttle } from '@nestjs/throttler';
 import { QUEUE_NAMES } from '../../common/queue/queue.module';
 import { NFeTransmissionService } from './nfe-transmission.service';
 import { NFeXmlBuilderService } from './nfe-xml-builder.service';
@@ -39,7 +38,6 @@ interface AuthenticatedRequest {
 
 @ApiTags('nfe')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('nfe')
 export class NFeController {
     private readonly logger = new Logger(NFeController.name);
@@ -53,6 +51,7 @@ export class NFeController {
         private readonly prisma: PrismaService,
     ) { }
 
+    @Throttle({ 'nfe-emit': { ttl: 60000, limit: 10 } })
     @Post('emitir')
     @HttpCode(HttpStatus.ACCEPTED)
     @ApiOperation({ summary: 'Emitir NFe' })

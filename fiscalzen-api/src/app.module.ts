@@ -12,6 +12,13 @@ import { LoggerModule } from 'nestjs-pino';
 import { StorageModule } from './common/storage';
 import { QueueModule } from './common/queue';
 import { CompaniesModule } from './companies';
+import { NotasFiscaisModule } from './notas-fiscais/notas-fiscais.module';
+import { TagsModule } from './tags/tags.module';
+import { FornecedoresModule } from './fornecedores/fornecedores.module';
+import { NotificacoesModule } from './notificacoes/notificacoes.module';
+import { AuditModule } from './audit/audit.module';
+import { EmpresaGuard } from './common/guards/empresa.guard';
+import { SanitizePipe } from './common/pipes/sanitize.pipe';
 
 @Module({
   imports: [
@@ -29,10 +36,28 @@ import { CompaniesModule } from './companies';
     PrismaModule,
     SefazModule,
     DashboardModule,
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 10,
-    }]),
+    NotasFiscaisModule,
+    TagsModule,
+    FornecedoresModule,
+    NotificacoesModule,
+    AuditModule,
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60000,
+        limit: 60,
+      },
+      {
+        name: 'short',
+        ttl: 60000,
+        limit: 5,
+      },
+      {
+        name: 'nfe-emit',
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [
@@ -40,7 +65,15 @@ import { CompaniesModule } from './companies';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    }
+    },
+    {
+      provide: APP_GUARD,
+      useClass: EmpresaGuard,
+    },
+    {
+      provide: 'APP_PIPE',
+      useClass: SanitizePipe,
+    },
   ],
 })
 export class AppModule { }

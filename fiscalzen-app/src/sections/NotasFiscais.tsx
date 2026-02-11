@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useNotasStore, useTagsStore } from '@/hooks/useStore'
-import { cn, formatCurrency, formatDate, formatCNPJCPF, formatChaveAcesso, getStatusLabel, getStatusColor, downloadFile } from '@/lib/utils'
+import { useNotasStore } from '@/stores/useNotasStore'
+import { useTagsStore } from '@/stores/useTagsStore'
+import { notasFiscaisService } from '@/services/notas-fiscais.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -47,32 +48,35 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Calendar } from '@/components/ui/calendar'
-import { CalendarIcon, Search, Filter, Download, FileText, MoreHorizontal, Eye, CheckCircle, XCircle, HelpCircle, Tag, Trash2, FileSpreadsheet, FileDown, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CalendarIcon, Search, Filter, Download, FileText, MoreHorizontal, Eye, CheckCircle, XCircle, HelpCircle, Tag, Trash2, FileSpreadsheet, FileDown, RefreshCw } from 'lucide-react'
 import { format, subDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { DateRange } from 'react-day-picker'
+import { cn, formatCurrency, formatDate, formatCNPJCPF, formatChaveAcesso, getStatusLabel, getStatusColor, downloadFile } from '@/lib/utils'
+import { toast } from 'sonner'
 import type { NotaFiscal } from '@/types'
-
-const ITEMS_PER_PAGE = 10
+import type { ManifestarDto } from '@/services/notas-fiscais.service'
 
 export function NotasFiscais() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { 
-    notas, 
-    filtros, 
-    setFiltros, 
-    notasSelecionadas, 
+  const {
+    notas,
+    filtros,
+    setFiltros,
+    notasSelecionadas,
     toggleNotaSelecionada,
     selecionarTodas,
     limparSelecao,
-    filtrarNotas,
-    atualizarStatusManifestacao
+    fetchNotas,
+    fetchMore,
+    loading,
+    error,
+    meta,
   } = useNotasStore()
-  const { tags } = useTagsStore()
+  const { tags, fetchTags } = useTagsStore()
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
   const [showFilters, setShowFilters] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
@@ -82,110 +86,115 @@ export function NotasFiscais() {
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [showManifestacaoDialog, setShowManifestacaoDialog] = useState(false)
   const [showDownloadDialog, setShowDownloadDialog] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
-  // Apply URL params to filters
-  useState(() => {
+  // Initial fetch
+  useEffect(() => {
+    fetchNotas()
+    fetchTags()
+  }, [])
+
+  // Apply URL params on mount
+  useEffect(() => {
     const statusParam = searchParams.get('status')
     const manifestacaoParam = searchParams.get('manifestacao')
     const searchParam = searchParams.get('search')
-    
-    if (statusParam) {
-      setFiltros({ ...filtros, statusSefaz: [statusParam as any] })
-    }
-    if (manifestacaoParam) {
-      setFiltros({ ...filtros, statusManifestacao: [manifestacaoParam as any] })
-    }
-    if (searchParam) {
-      setSearchQuery(searchParam)
-    }
-  })
+    const newFilters: Record<string, any> = {}
+    if (statusParam) newFilters.statusSefaz = statusParam
+    if (manifestacaoParam) newFilters.statusManifestacao = manifestacaoParam
+    if (searchParam) { setSearchQuery(searchParam); newFilters.emitenteNome = searchParam }
+    if (Object.keys(newFilters).length > 0) fetchNotas(newFilters)
+  }, [searchParams])
 
-  // Filter notas
-  const filteredNotas = useMemo(() => {
-    let result = filtrarNotas()
-    
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(n => 
-        n.emitenteNome.toLowerCase().includes(query) ||
-        n.emitenteCnpj.includes(query) ||
-        n.chaveAcesso.includes(query) ||
-        n.numero.includes(query)
-      )
-    }
-    
-    if (dateRange?.from) {
-      result = result.filter(n => new Date(n.dataEmissao) >= dateRange.from!)
-    }
-    if (dateRange?.to) {
-      result = result.filter(n => new Date(n.dataEmissao) <= dateRange.to!)
-    }
-    
-    return result.sort((a, b) => new Date(b.dataEmissao).getTime() - new Date(a.dataEmissao).getTime())
-  }, [notas, filtros, searchQuery, dateRange])
+  // Debounced search
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (searchQuery) {
+        fetchNotas({ ...filtros, emitenteNome: searchQuery })
+      } else if (filtros.emitenteNome) {
+        const { emitenteNome, ...rest } = filtros as any
+        fetchNotas(rest)
+      }
+    }, 400)
+    return () => clearTimeout(timeout)
+  }, [searchQuery])
 
-  // Pagination
-  const totalPages = Math.ceil(filteredNotas.length / ITEMS_PER_PAGE)
-  const paginatedNotas = filteredNotas.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  )
+  // Refetch on date range change
+  useEffect(() => {
+    if (dateRange?.from || dateRange?.to) {
+      fetchNotas({
+        ...filtros,
+        periodoInicio: dateRange?.from?.toISOString(),
+        periodoFim: dateRange?.to?.toISOString(),
+      })
+    }
+  }, [dateRange])
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      selecionarTodas(paginatedNotas.map(n => n.id))
+      selecionarTodas(notas.map(n => n.id))
     } else {
       limparSelecao()
     }
   }
 
-  const handleDownload = (nota: NotaFiscal, tipo: 'xml' | 'pdf' | 'ambos') => {
-    // Mock download - in production, fetch from API
-    const mockContent = `<?xml version="1.0" encoding="UTF-8"?>
-<nfeProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
-  <NFe>
-    <infNFe Id="${nota.chaveAcesso}">
-      <ide>
-        <cUF>35</cUF>
-        <cNF>${nota.numero}</cNF>
-        <natOp>${nota.naturezaOperacao}</natOp>
-        <mod>55</mod>
-        <serie>${nota.serie}</serie>
-        <nNF>${nota.numero}</nNF>
-        <dhEmi>${nota.dataEmissao}</dhEmi>
-      </ide>
-    </infNFe>
-  </NFe>
-</nfeProc>`
-    
-    if (tipo === 'xml' || tipo === 'ambos') {
-      downloadFile(mockContent, `${nota.chaveAcesso}-nfe.xml`, 'application/xml')
+  const handleDownload = async (nota: NotaFiscal, tipo: 'xml' | 'pdf' | 'ambos') => {
+    setActionLoading(true)
+    try {
+      if (tipo === 'xml' || tipo === 'ambos') {
+        const blob = await notasFiscaisService.downloadXml(nota.id)
+        downloadFile(blob, `${nota.chaveAcesso}-nfe.xml`)
+      }
+      if (tipo === 'pdf' || tipo === 'ambos') {
+        // PDF download — uses same endpoint for now
+        const blob = await notasFiscaisService.downloadXml(nota.id)
+        downloadFile(blob, `${nota.chaveAcesso}-danfe.pdf`)
+      }
+      toast.success('Download realizado com sucesso')
+    } catch (err) {
+      toast.error('Falha ao realizar download')
+    } finally {
+      setActionLoading(false)
+      setShowDownloadDialog(false)
     }
-    if (tipo === 'pdf' || tipo === 'ambos') {
-      // Mock PDF download
-      const blob = new Blob(['PDF content'], { type: 'application/pdf' })
-      downloadFile(blob, `${nota.chaveAcesso}-danfe.pdf`)
-    }
-    setShowDownloadDialog(false)
   }
 
-  const handleManifestacao = (nota: NotaFiscal, tipo: string) => {
-    atualizarStatusManifestacao(nota.id, tipo)
-    setShowManifestacaoDialog(false)
+  const handleManifestacao = async (nota: NotaFiscal, tipo: string) => {
+    setActionLoading(true)
+    try {
+      await notasFiscaisService.manifestar(nota.id, { tipo } as ManifestarDto)
+      toast.success(`Manifestação "${tipo}" registrada com sucesso`)
+      fetchNotas(filtros)
+    } catch (err) {
+      toast.error('Falha ao registrar manifestação')
+    } finally {
+      setActionLoading(false)
+      setShowManifestacaoDialog(false)
+    }
   }
 
   const handleBatchDownload = () => {
-    // Mock batch download as ZIP
     const selectedNotasList = notas.filter(n => notasSelecionadas.includes(n.id))
-    alert(`Download em lote de ${selectedNotasList.length} notas será iniciado.`)
+    toast.info(`Download em lote de ${selectedNotasList.length} notas será iniciado.`)
     limparSelecao()
   }
 
-  const handleBatchManifestacao = (tipo: string) => {
-    notasSelecionadas.forEach(id => {
-      atualizarStatusManifestacao(id, tipo)
-    })
-    limparSelecao()
+  const handleBatchManifestacao = async (tipo: string) => {
+    setActionLoading(true)
+    try {
+      await Promise.all(
+        notasSelecionadas.map(id =>
+          notasFiscaisService.manifestar(id, { tipo } as ManifestarDto)
+        )
+      )
+      toast.success(`${notasSelecionadas.length} manifestações registradas`)
+      fetchNotas(filtros)
+      limparSelecao()
+    } catch (err) {
+      toast.error('Falha ao registrar manifestações em lote')
+    } finally {
+      setActionLoading(false)
+    }
   }
 
   return (
@@ -223,7 +232,7 @@ export function NotasFiscais() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="min-w-[240px]">
@@ -254,8 +263,8 @@ export function NotasFiscais() {
               </PopoverContent>
             </Popover>
 
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(showFilters && 'bg-muted')}
             >
@@ -264,8 +273,8 @@ export function NotasFiscais() {
             </Button>
 
             {(searchQuery || dateRange?.from || Object.keys(filtros).length > 0) && (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={() => {
                   setSearchQuery('')
                   setDateRange(undefined)
@@ -282,9 +291,9 @@ export function NotasFiscais() {
             <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-4">
               <div>
                 <Label className="text-xs">Tipo de Documento</Label>
-                <Select 
-                  value={filtros.tipo?.[0] || 'all'}
-                  onValueChange={(v) => setFiltros({ ...filtros, tipo: v === 'all' ? undefined : [v as any] })}
+                <Select
+                  value={filtros.tipo || 'all'}
+                  onValueChange={(v) => setFiltros({ ...filtros, tipo: v === 'all' ? undefined : v })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Todos" />
@@ -301,8 +310,8 @@ export function NotasFiscais() {
               <div>
                 <Label className="text-xs">Status SEFAZ</Label>
                 <Select
-                  value={filtros.statusSefaz?.[0] || 'all'}
-                  onValueChange={(v) => setFiltros({ ...filtros, statusSefaz: v === 'all' ? undefined : [v as any] })}
+                  value={filtros.statusSefaz || 'all'}
+                  onValueChange={(v) => setFiltros({ ...filtros, statusSefaz: v === 'all' ? undefined : v })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Todos" />
@@ -319,8 +328,8 @@ export function NotasFiscais() {
               <div>
                 <Label className="text-xs">Manifestação</Label>
                 <Select
-                  value={filtros.statusManifestacao?.[0] || 'all'}
-                  onValueChange={(v) => setFiltros({ ...filtros, statusManifestacao: v === 'all' ? undefined : [v as any] })}
+                  value={filtros.statusManifestacao || 'all'}
+                  onValueChange={(v) => setFiltros({ ...filtros, statusManifestacao: v === 'all' ? undefined : v })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Todas" />
@@ -404,8 +413,8 @@ export function NotasFiscais() {
                   <DropdownMenuContent>
                     {tags.map(tag => (
                       <DropdownMenuItem key={tag.id}>
-                        <div 
-                          className="w-3 h-3 rounded-full mr-2" 
+                        <div
+                          className="w-3 h-3 rounded-full mr-2"
                           style={{ backgroundColor: tag.cor }}
                         />
                         {tag.nome}
@@ -428,7 +437,7 @@ export function NotasFiscais() {
       <Card>
         <CardHeader className="pb-0">
           <div className="flex items-center justify-between">
-            <CardTitle>Resultados ({filteredNotas.length})</CardTitle>
+            <CardTitle>Resultados ({meta.total})</CardTitle>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm">
                 <FileSpreadsheet className="mr-2 h-4 w-4" />
@@ -446,8 +455,8 @@ export function NotasFiscais() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12">
-                  <Checkbox 
-                    checked={paginatedNotas.length > 0 && paginatedNotas.every(n => notasSelecionadas.includes(n.id))}
+                  <Checkbox
+                    checked={notas.length > 0 && notas.every((n: NotaFiscal) => notasSelecionadas.includes(n.id))}
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
@@ -462,19 +471,19 @@ export function NotasFiscais() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedNotas.length === 0 ? (
+              {notas.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>Nenhuma nota fiscal encontrada</p>
+                    <p>{loading ? 'Carregando...' : 'Nenhuma nota fiscal encontrada'}</p>
                     <p className="text-sm">Tente ajustar os filtros de busca</p>
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedNotas.map((nota) => (
+                notas.map((nota: NotaFiscal) => (
                   <TableRow key={nota.id} className="cursor-pointer hover:bg-muted/50">
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox 
+                      <Checkbox
                         checked={notasSelecionadas.includes(nota.id)}
                         onCheckedChange={() => toggleNotaSelecionada(nota.id)}
                       />
@@ -502,8 +511,8 @@ export function NotasFiscais() {
                       </Badge>
                     </TableCell>
                     <TableCell onClick={() => { setSelectedNota(nota); setShowDetailDialog(true) }}>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={cn(
                           nota.statusManifestacao === 'confirmada' && 'border-green-500 text-green-600',
                           nota.statusManifestacao === 'pendente' && 'border-yellow-500 text-yellow-600',
@@ -552,36 +561,21 @@ export function NotasFiscais() {
           </Table>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t">
-              <p className="text-sm text-muted-foreground">
-                Mostrando {(currentPage - 1) * ITEMS_PER_PAGE + 1} a{' '}
-                {Math.min(currentPage * ITEMS_PER_PAGE, filteredNotas.length)} de{' '}
-                {filteredNotas.length} resultados
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm">
-                  Página {currentPage} de {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+          <div className="flex items-center justify-between p-4 border-t">
+            <p className="text-sm text-muted-foreground">
+              Mostrando {notas.length} de {meta.total} resultados
+            </p>
+            {meta.hasMore && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchMore()}
+                disabled={loading}
+              >
+                {loading ? 'Carregando...' : 'Carregar mais'}
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -697,8 +691,8 @@ export function NotasFiscais() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'ciencia')}
             >
@@ -708,8 +702,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Tomei ciência da operação</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'confirmada')}
             >
@@ -719,8 +713,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Confirmo a realização da operação</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'desconhecida')}
             >
@@ -730,8 +724,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Não reconheço esta operação</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'nao_realizada')}
             >
@@ -755,8 +749,8 @@ export function NotasFiscais() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleDownload(selectedNota, 'xml')}
             >
@@ -766,8 +760,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Arquivo XML oficial da SEFAZ</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleDownload(selectedNota, 'pdf')}
             >
@@ -777,8 +771,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Documento auxiliar em PDF</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleDownload(selectedNota, 'ambos')}
             >

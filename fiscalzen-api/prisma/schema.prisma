@@ -34,6 +34,8 @@ model Empresa {
   usuarios          Usuario[]
   notasFiscais      NotaFiscal[]
   tags              Tag[]
+  fornecedores      Fornecedor[]
+  notificacoes      Notificacao[]
 
   @@map("empresas")
 }
@@ -52,6 +54,7 @@ model Usuario {
   empresa         Empresa   @relation(fields: [empresaId], references: [id])
   
   manifestacoes   Manifestacao[]
+  notificacoes    Notificacao[]
 
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
@@ -95,6 +98,9 @@ model NotaFiscal {
   @@map("notas_fiscais")
   @@index([empresaId])
   @@index([dataEmissao])
+  @@index([emitenteCnpj])
+  @@index([statusManifestacao])
+  @@index([empresaId, statusManifestacao])
 }
 
 model Manifestacao {
@@ -128,4 +134,66 @@ model Tag {
   createdAt   DateTime    @default(now()) @map("created_at")
 
   @@map("tags")
+  @@unique([empresaId, nome])
+}
+
+model Fornecedor {
+  id           String   @id @default(uuid())
+  cnpj         String
+  razaoSocial  String   @map("razao_social")
+  nomeFantasia String?  @map("nome_fantasia")
+  email        String?
+  telefone     String?
+  observacoes  String?
+  ativo        Boolean  @default(true)
+
+  empresaId    String   @map("empresa_id")
+  empresa      Empresa  @relation(fields: [empresaId], references: [id])
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([empresaId, cnpj])
+  @@map("fornecedores")
+  @@index([empresaId])
+}
+
+model Notificacao {
+  id         String   @id @default(uuid())
+  tipo       String   // NFE_RECEBIDA, NFE_REJEITADA, MANIFESTO_PENDENTE, CERTIFICADO_EXPIRANDO
+  titulo     String
+  mensagem   String
+  lida       Boolean  @default(false)
+  dadosExtra Json?    @map("dados_extra")
+
+  usuarioId  String?  @map("usuario_id")
+  usuario    Usuario? @relation(fields: [usuarioId], references: [id])
+  empresaId  String   @map("empresa_id")
+  empresa    Empresa  @relation(fields: [empresaId], references: [id])
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("notificacoes")
+  @@index([empresaId, lida])
+  @@index([usuarioId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  acao       String   // CREATE, UPDATE, DELETE, LOGIN, MANIFESTAR, IMPORT_XML
+  entidade   String   // NotaFiscal, Fornecedor, Usuario, etc.
+  entidadeId String?  @map("entidade_id")
+  dados      Json?    // { antes?: {}, depois?: {} }
+
+  usuarioId  String?  @map("usuario_id")
+  empresaId  String   @map("empresa_id")
+  ipOrigem   String?  @map("ip_origem")
+  userAgent  String?  @map("user_agent")
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+  @@index([empresaId, createdAt])
+  @@index([entidade, entidadeId])
+  @@index([usuarioId])
 }
