@@ -2,6 +2,16 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DashboardService {
+    async getStats(periodo: string, empresaId: string) {
+        // TODO: Replace with real stats logic filtered by empresaId and periodo
+        return {
+            totalNfe: 150,
+            totalTax: 5000.00,
+            pendingIssues: 3,
+            periodo,
+        };
+    }
+
     async getTimeline(empresaId: string) {
         // TODO: Replace with real data filtered by empresaId
         return [

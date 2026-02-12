@@ -20,8 +20,10 @@ export class StorageService {
     private readonly s3Client: S3Client;
     private readonly bucket: string;
     private readonly endpoint: string;
+    private readonly externalEndpoint: string;
 
     constructor() {
+        // Internal endpoint for S3Client (API -> MinIO)
         const endpoint = `http${process.env.MINIO_USE_SSL === 'true' ? 's' : ''}://${process.env.MINIO_ENDPOINT || 'localhost'}:${process.env.MINIO_PORT || '9000'}`;
 
         this.s3Client = new S3Client({
@@ -36,7 +38,14 @@ export class StorageService {
 
         this.bucket = process.env.MINIO_BUCKET_NAME || 'fiscalzen-storage';
         this.endpoint = endpoint;
-        this.logger.log(`Storage configured: ${endpoint}/${this.bucket}`);
+
+        // External endpoint for Public URLs (Browser -> MinIO)
+        // Defaults to internal endpoint if external vars are not set
+        const extHost = process.env.MINIO_EXTERNAL_ENDPOINT || process.env.MINIO_ENDPOINT || 'localhost';
+        const extPort = process.env.MINIO_EXTERNAL_PORT || process.env.MINIO_PORT || '9000';
+        this.externalEndpoint = `http${process.env.MINIO_USE_SSL === 'true' ? 's' : ''}://${extHost}:${extPort}`;
+
+        this.logger.log(`Storage configured: Internal=${endpoint}, External=${this.externalEndpoint}`);
     }
 
     async upload(
@@ -57,7 +66,7 @@ export class StorageService {
         return {
             key,
             bucket: this.bucket,
-            url: `${this.endpoint}/${this.bucket}/${key}`,
+            url: `${this.externalEndpoint}/${this.bucket}/${key}`,
         };
     }
 
@@ -101,6 +110,6 @@ export class StorageService {
     }
 
     getPublicUrl(key: string): string {
-        return `${this.endpoint}/${this.bucket}/${key}`;
+        return `${this.externalEndpoint}/${this.bucket}/${key}`;
     }
 }

@@ -1,6 +1,8 @@
 import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const PdfPrinter = require('pdfmake');
+const PdfPrinterLib = require('pdfmake/js/Printer');
+// Console logs already added in PdfGeneratorService, adding here just in case this service loads first
+const PdfPrinter = PdfPrinterLib.default || PdfPrinterLib;
 const printer: any = PdfPrinter;
 import { TDocumentDefinitions, Content, TableCell, TFontDictionary } from 'pdfmake/interfaces';
 import { PrismaService } from '../../prisma/prisma.service';

@@ -1,0 +1,79 @@
+
+> fiscalzen-api@0.0.1 test
+> jest src/sefaz/nfe/xml-signer.service.spec.ts
+
+FAIL src/sefaz/nfe/xml-signer.service.spec.ts
+  XmlSignerService
+    √ should be defined (9 ms)
+    signNFeXml
+      × should call loadFromStorage with correct parameters (2 ms)
+      × should return signed XML with Signature element (1 ms)
+      × should include X509Certificate in signed XML (1 ms)
+      √ should throw when certificate loading fails (5 ms)
+    signXml
+      √ should sign XML with provided certificate (6 ms)
+      √ should throw when element Id not found (2 ms)
+      √ should include correct algorithm URIs (3 ms)
+      √ should include enveloped-signature transform (4 ms)
+    verifySignature
+      √ should return false for unsigned XML (1 ms)
+      √ should return false for XML without DigestValue
+      √ should return false for XML without Reference URI (1 ms)
+      √ should not throw on any input (4 ms)
+    signature structure
+      √ should not break XML structure (4 ms)
+      √ should include KeyInfo with X509Data (3 ms)
+
+  ● XmlSignerService › signNFeXml › should call loadFromStorage with correct parameters
+
+    BadRequestException: Element with Id containing "infNFe" not found in XML
+
+    [0m [90m 37 |[39m
+     [90m 38 |[39m             [36mif[39m ([33m![39mmatch) {
+    [31m[1m>[22m[39m[90m 39 |[39m                 [36mthrow[39m [36mnew[39m [33mBadRequestException[39m([32m`Element with Id containing "${referenceId}" not found in XML`[39m)[33m;[39m
+     [90m    |[39m                       [31m[1m^[22m[39m
+     [90m 40 |[39m             }
+     [90m 41 |[39m
+     [90m 42 |[39m             [36mconst[39m fullId [33m=[39m match[[35m1[39m][33m;[39m[0m
+
+      at XmlSignerService.signXml (sefaz/nfe/xml-signer.service.ts:39:23)
+      at XmlSignerService.signNFeXml (sefaz/nfe/xml-signer.service.ts:23:21)
+      at Object.<anonymous> (sefaz/nfe/xml-signer.service.spec.ts:86:13)
+
+  ● XmlSignerService › signNFeXml › should return signed XML with Signature element
+
+    BadRequestException: Element with Id containing "infNFe" not found in XML
+
+    [0m [90m 37 |[39m
+     [90m 38 |[39m             [36mif[39m ([33m![39mmatch) {
+    [31m[1m>[22m[39m[90m 39 |[39m                 [36mthrow[39m [36mnew[39m [33mBadRequestException[39m([32m`Element with Id containing "${referenceId}" not found in XML`[39m)[33m;[39m
+     [90m    |[39m                       [31m[1m^[22m[39m
+     [90m 40 |[39m             }
+     [90m 41 |[39m
+     [90m 42 |[39m             [36mconst[39m fullId [33m=[39m match[[35m1[39m][33m;[39m[0m
+
+      at XmlSignerService.signXml (sefaz/nfe/xml-signer.service.ts:39:23)
+      at XmlSignerService.signNFeXml (sefaz/nfe/xml-signer.service.ts:23:21)
+      at Object.<anonymous> (sefaz/nfe/xml-signer.service.spec.ts:101:31)
+
+  ● XmlSignerService › signNFeXml › should include X509Certificate in signed XML
+
+    BadRequestException: Element with Id containing "infNFe" not found in XML
+
+    [0m [90m 37 |[39m
+     [90m 38 |[39m             [36mif[39m ([33m![39mmatch) {
+    [31m[1m>[22m[39m[90m 39 |[39m                 [36mthrow[39m [36mnew[39m [33mBadRequestException[39m([32m`Element with Id containing "${referenceId}" not found in XML`[39m)[33m;[39m
+     [90m    |[39m                       [31m[1m^[22m[39m
+     [90m 40 |[39m             }
+     [90m 41 |[39m
+     [90m 42 |[39m             [36mconst[39m fullId [33m=[39m match[[35m1[39m][33m;[39m[0m
+
+      at XmlSignerService.signXml (sefaz/nfe/xml-signer.service.ts:39:23)
+      at XmlSignerService.signNFeXml (sefaz/nfe/xml-signer.service.ts:23:21)
+      at Object.<anonymous> (sefaz/nfe/xml-signer.service.spec.ts:118:31)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 12 passed, 15 total
+Snapshots:   0 total
+Time:        2.039 s
+Ran all test suites matching src/sefaz/nfe/xml-signer.service.spec.ts.

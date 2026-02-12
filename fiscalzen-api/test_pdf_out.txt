@@ -1,0 +1,43 @@
+
+> fiscalzen-api@0.0.1 test
+> jest src/reports/generators/pdf-generator/pdf-generator.service.spec.ts
+
+FAIL src/reports/generators/pdf-generator/pdf-generator.service.spec.ts
+  PdfGeneratorService
+    × should be defined (6 ms)
+
+  ● PdfGeneratorService › should be defined
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 19 |[39m
+     [90m 20 |[39m     constructor() {
+    [31m[1m>[22m[39m[90m 21 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 22 |[39m     }
+     [90m 23 |[39m
+     [90m 24 |[39m     generateReport(title[33m:[39m string[33m,[39m data[33m:[39m any[][33m,[39m columns[33m:[39m string[])[33m:[39m [33mPromise[39m[33m<[39m[33mBuffer[39m[33m>[39m {[0m
+
+      at new PdfGeneratorService (reports/generators/pdf-generator/pdf-generator.service.ts:21:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (reports/generators/pdf-generator/pdf-generator.service.spec.ts:8:35)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        0.782 s, estimated 1 s
+Ran all test suites matching src/reports/generators/pdf-generator/pdf-generator.service.spec.ts.

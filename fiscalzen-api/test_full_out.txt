@@ -1,0 +1,636 @@
+
+> fiscalzen-api@0.0.1 test
+> jest
+
+FAIL src/users/users.controller.spec.ts
+  ● UsersController › should be defined
+
+    Nest can't resolve dependencies of the RolesGuard (Reflector, ?). Please make sure that the argument PrismaService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If PrismaService is a provider, is it part of the current RootTestModule?
+    - If PrismaService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing PrismaService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m  6 |[39m
+     [90m  7 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  8 |[39m     [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m  9 |[39m       controllers[33m:[39m [[33mUsersController[39m][33m,[39m
+     [90m 10 |[39m     })[33m.[39mcompile()[33m;[39m
+     [90m 11 |[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadInjectable (../node_modules/@nestjs/core/injector/injector.js:99:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:80:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstancesOfInjectables (../node_modules/@nestjs/core/injector/instance-loader.js:79:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:41:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (users/users.controller.spec.ts:8:35)
+
+PASS src/reports/generators/pdf-generator/pdf-generator.service.spec.ts
+PASS src/reports/reports.service.spec.ts
+PASS src/app.controller.spec.ts
+PASS src/auth/auth.service.spec.ts
+PASS src/security-unit.spec.ts
+PASS src/sefaz/nfe/nfe-xml-builder.service.spec.ts
+PASS src/users/users.service.spec.ts
+PASS src/notas-fiscais/notas-fiscais.service.spec.ts
+PASS src/tags/tags.service.spec.ts
+PASS src/prisma/prisma.service.spec.ts
+FAIL src/sefaz/nfe/danfe-generator.service.spec.ts
+  ● DanfeGeneratorService › should be defined
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generate › should generate PDF buffer
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generate › should generate valid PDF with header
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generate › should handle missing destinatario
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generate › should handle empty produtos array
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generate › should handle missing protocolo
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generate › should handle multiple products
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generateFromChave › should throw NotFoundException when NFe not found
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generateFromChave › should throw BadRequestException for non-authorized NFe
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › generateFromChave › should generate PDF for authorized NFe
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › formatting utilities › formatCnpj should format CNPJ correctly
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › formatting utilities › formatCnpj should return already formatted CNPJ
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › formatting utilities › formatChaveAcesso should format with spaces
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › formatting utilities › formatDate should format date correctly
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › formatting utilities › formatDate should handle null
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+  ● DanfeGeneratorService › formatting utilities › formatCurrency should format currency correctly
+
+    TypeError: PdfPrinter is not a constructor
+
+    [0m [90m 82 |[39m
+     [90m 83 |[39m     constructor([36mprivate[39m readonly prisma[33m:[39m [33mPrismaService[39m) {
+    [31m[1m>[22m[39m[90m 84 |[39m         [36mthis[39m[33m.[39mprinter [33m=[39m [36mnew[39m [33mPdfPrinter[39m(fonts)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 85 |[39m     }
+     [90m 86 |[39m
+     [90m 87 |[39m     [90m/**[39m[0m
+
+      at new DanfeGeneratorService (sefaz/nfe/danfe-generator.service.ts:84:24)
+      at TestingInjector.instantiateClass (../node_modules/@nestjs/core/injector/injector.js:422:19)
+      at callback (../node_modules/@nestjs/core/injector/injector.js:70:45)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:170:24)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/nfe/danfe-generator.service.spec.ts:65:39)
+
+PASS src/reports/generators/excel-generator/excel-generator.service.spec.ts
+FAIL src/sefaz/sefaz.service.spec.ts
+  ● SefazService › should be defined
+
+    Nest can't resolve dependencies of the SefazService (?, SoapService, CertificateService). Please make sure that the argument XmlFactoryService at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If XmlFactoryService is a provider, is it part of the current RootTestModule?
+    - If XmlFactoryService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing XmlFactoryService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m  6 |[39m
+     [90m  7 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  8 |[39m     [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m  9 |[39m       providers[33m:[39m [[33mSefazService[39m][33m,[39m
+     [90m 10 |[39m     })[33m.[39mcompile()[33m;[39m
+     [90m 11 |[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/sefaz.service.spec.ts:8:35)
+
+FAIL src/sefaz/sefaz.controller.spec.ts
+  ● SefazController › should be defined
+
+    Nest can't resolve dependencies of the SefazController (?). Please make sure that the argument SefazService at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If SefazService is a provider, is it part of the current RootTestModule?
+    - If SefazService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing SefazService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m  6 |[39m
+     [90m  7 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  8 |[39m     [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m  9 |[39m       controllers[33m:[39m [[33mSefazController[39m][33m,[39m
+     [90m 10 |[39m     })[33m.[39mcompile()[33m;[39m
+     [90m 11 |[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadController (../node_modules/@nestjs/core/injector/injector.js:94:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:68:13
+          at async Promise.all (index 0)
+      at TestingInstanceLoader.createInstancesOfControllers (../node_modules/@nestjs/core/injector/instance-loader.js:67:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:42:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (sefaz/sefaz.controller.spec.ts:8:35)
+
+PASS src/auth/auth.controller.spec.ts
+[31m[Nest] 26692  - [39m11/02/2026, 23:52:32 [31m  ERROR[39m [38;5;3m[NFeTransmissionService] [39m[31mNFe transmission failed:[39m
+Certificate not found
+[31m[Nest] 26692  - [39m11/02/2026, 23:52:32 [31m  ERROR[39m [38;5;3m[NFeTransmissionService] [39m[31mRecibo consultation failed:[39m
+Network error
+PASS src/sefaz/nfe/nfe-transmission.service.spec.ts
+PASS src/reports/reports.controller.spec.ts
+PASS src/sefaz/nfe/xml-signer.service.spec.ts
+
+Test Suites: 4 failed, 15 passed, 19 total
+Tests:       19 failed, 100 passed, 119 total
+Snapshots:   0 total
+Time:        3.883 s, estimated 4 s
+Ran all test suites.

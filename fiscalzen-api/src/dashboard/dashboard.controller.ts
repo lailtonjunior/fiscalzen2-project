@@ -8,6 +8,13 @@ import { DashboardService } from './dashboard.service';
 export class DashboardController {
     constructor(private readonly dashboardService: DashboardService) { }
 
+    @Get('stats')
+    @ApiOperation({ summary: 'Obter estatísticas do dashboard' })
+    @ApiResponse({ status: 200, description: 'Estatísticas recuperadas com sucesso.' })
+    async getStats(@Request() req: any) {
+        return this.dashboardService.getStats(req.query.periodo, req.user.empresaId);
+    }
+
     @Get('timeline')
     @ApiOperation({ summary: 'Obter linha do tempo de eventos' })
     @ApiResponse({ status: 200, description: 'Lista de eventos recentes.' })

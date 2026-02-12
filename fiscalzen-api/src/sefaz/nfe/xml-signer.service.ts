@@ -20,7 +20,7 @@ export class XmlSignerService {
         const password = this.certificateService.getPassword();
         const parsed = await this.certificateService.loadFromStorage(companyId, password);
 
-        return this.signXml(xml, parsed, 'infNFe');
+        return this.signXml(xml, parsed, 'NFe');
     }
 
     /**

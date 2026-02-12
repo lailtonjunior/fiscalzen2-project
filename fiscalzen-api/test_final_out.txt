@@ -1,0 +1,74 @@
+
+> fiscalzen-api@0.0.1 test
+> jest
+
+PASS src/reports/reports.service.spec.ts
+PASS src/reports/generators/pdf-generator/pdf-generator.service.spec.ts
+PASS src/auth/auth.service.spec.ts
+PASS src/sefaz/nfe/danfe-generator.service.spec.ts
+PASS src/app.controller.spec.ts
+FAIL src/users/users.controller.spec.ts
+  ● UsersController › should be defined
+
+    Nest can't resolve dependencies of the RolesGuard (Reflector, ?). Please make sure that the argument PrismaService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If PrismaService is a provider, is it part of the current RootTestModule?
+    - If PrismaService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing PrismaService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m  6 |[39m
+     [90m  7 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  8 |[39m     [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m  9 |[39m       controllers[33m:[39m [[33mUsersController[39m][33m,[39m
+     [90m 10 |[39m     })[33m.[39mcompile()[33m;[39m
+     [90m 11 |[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadInjectable (../node_modules/@nestjs/core/injector/injector.js:99:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:80:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstancesOfInjectables (../node_modules/@nestjs/core/injector/instance-loader.js:79:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:41:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (users/users.controller.spec.ts:8:35)
+
+PASS src/security-unit.spec.ts
+PASS src/sefaz/nfe/nfe-xml-builder.service.spec.ts
+PASS src/notas-fiscais/notas-fiscais.service.spec.ts
+PASS src/tags/tags.service.spec.ts
+PASS src/prisma/prisma.service.spec.ts
+PASS src/users/users.service.spec.ts
+PASS src/sefaz/sefaz.service.spec.ts
+PASS src/reports/generators/excel-generator/excel-generator.service.spec.ts
+PASS src/sefaz/sefaz.controller.spec.ts
+[31m[Nest] 29784  - [39m11/02/2026, 23:55:15 [31m  ERROR[39m [38;5;3m[NFeTransmissionService] [39m[31mNFe transmission failed:[39m
+Certificate not found
+[31m[Nest] 29784  - [39m11/02/2026, 23:55:15 [31m  ERROR[39m [38;5;3m[NFeTransmissionService] [39m[31mRecibo consultation failed:[39m
+Network error
+PASS src/sefaz/nfe/nfe-transmission.service.spec.ts
+PASS src/auth/auth.controller.spec.ts
+PASS src/reports/reports.controller.spec.ts
+PASS src/sefaz/nfe/xml-signer.service.spec.ts
+
+Test Suites: 1 failed, 18 passed, 19 total
+Tests:       1 failed, 104 passed, 105 total
+Snapshots:   0 total
+Time:        3.87 s, estimated 4 s
+Ran all test suites.

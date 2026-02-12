@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -19,6 +20,7 @@ import { NotificacoesModule } from './notificacoes/notificacoes.module';
 import { AuditModule } from './audit/audit.module';
 import { EmpresaGuard } from './common/guards/empresa.guard';
 import { SanitizePipe } from './common/pipes/sanitize.pipe';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -58,6 +60,7 @@ import { SanitizePipe } from './common/pipes/sanitize.pipe';
         limit: 10,
       },
     ]),
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -65,6 +68,10 @@ import { SanitizePipe } from './common/pipes/sanitize.pipe';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
     {
       provide: APP_GUARD,

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 async function main() {
     const email = 'admin@fiscalzen.com.br';
-    const password = 'admin';
+    const password = 'admin123';
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 1. Criar empresa com dados mínimos
