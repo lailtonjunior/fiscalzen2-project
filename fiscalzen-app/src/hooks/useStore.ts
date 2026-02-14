@@ -476,6 +476,11 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   error: null,
   setPeriodo: (periodo) => set({ periodo }),
   refreshStats: async () => {
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      set({ isLoading: false, error: 'Não autenticado' })
+      return
+    }
     set({ isLoading: true, error: null })
     try {
       const [timeline, integrity] = await Promise.all([
@@ -483,22 +488,23 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         dashboardService.getIntegrity()
       ])
 
-      // Simulate API delay for smoother UX (remove in prod if real API is fast)
-      await new Promise(resolve => setTimeout(resolve, 800))
-
       set({
         timeline,
         integrity,
-        // In a real app, we would fetch stats and charts here too
         stats: mockDasboardStats,
         isLoading: false
       })
     } catch (error: any) {
+      // Don't retry on auth errors
+      if (error.response?.status === 401) {
+        set({ isLoading: false, error: 'Sessão expirada' })
+        return
+      }
       set({
         error: 'Falha ao carregar dados do dashboard',
         isLoading: false
       })
-      console.error('ashboard Error:', error)
+      console.error('Dashboard Error:', error)
     }
   }
 }))

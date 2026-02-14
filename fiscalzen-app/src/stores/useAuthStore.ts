@@ -4,7 +4,7 @@ import { authService } from '../services/auth.service';
 interface User {
     id: string;
     email: string;
-    nombre: string;
+    nome: string;
     empresaId: string;
 }
 
@@ -18,14 +18,14 @@ interface AuthState {
     login: (email: string, password: string) => Promise<void>;
     register: (data: any) => Promise<void>;
     logout: () => void;
-    checkAuth: () => void;
+    checkAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     token: localStorage.getItem('auth_token'),
-    isAuthenticated: !!localStorage.getItem('auth_token'),
-    isLoading: false,
+    isAuthenticated: false,
+    isLoading: true,
     error: null,
 
     login: async (email, password) => {
@@ -70,16 +70,28 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     logout: () => {
         localStorage.removeItem('auth_token');
-        set({ user: null, token: null, isAuthenticated: false });
+        set({ user: null, token: null, isAuthenticated: false, isLoading: false });
     },
 
-    checkAuth: () => {
+    checkAuth: async () => {
         const token = localStorage.getItem('auth_token');
-        if (token) {
-            set({ isAuthenticated: true, token });
-            // Optionally fetch profile to validate token
-        } else {
-            set({ isAuthenticated: false, token: null, user: null });
+        if (!token) {
+            set({ isAuthenticated: false, token: null, user: null, isLoading: false });
+            return;
+        }
+        // Validate token with backend
+        try {
+            const profile = await authService.getProfile() as any;
+            set({
+                isAuthenticated: true,
+                token,
+                user: profile.user ?? profile,
+                isLoading: false,
+            });
+        } catch {
+            // Token is invalid or expired
+            localStorage.removeItem('auth_token');
+            set({ isAuthenticated: false, token: null, user: null, isLoading: false });
         }
     }
 }));

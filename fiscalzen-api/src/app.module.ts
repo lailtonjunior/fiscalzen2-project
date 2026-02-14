@@ -31,7 +31,7 @@ import { CompaniesModule } from './companies';
     DashboardModule,
     ThrottlerModule.forRoot([{
       ttl: 60000,
-      limit: 10,
+      limit: 60,
     }]),
   ],
   controllers: [AppController],

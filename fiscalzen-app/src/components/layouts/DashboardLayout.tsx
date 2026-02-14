@@ -12,7 +12,7 @@ export function DashboardLayout() {
 
     useEffect(() => {
         checkAuth()
-    }, [])
+    }, [checkAuth])
 
     if (isLoading) {
         return <div className="flex h-screen items-center justify-center">Carregando...</div>

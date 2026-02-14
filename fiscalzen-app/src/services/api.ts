@@ -22,27 +22,27 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+// Prevent multiple 401 redirects from concurrent requests
+let isRedirectingToLogin = false;
+
 // Response Interceptor: Handle Errors globally
 api.interceptors.response.use(
     (response) => response.data, // Unwrap data directly
     (error) => {
-        const message = error.response?.data?.message || 'Ocorreu um erro inesperado.';
-
-        // Auth Errors
+        // Auth Errors — redirect once, suppress duplicate toasts
         if (error.response?.status === 401) {
-            toast.error('Sessão expirada. Faça login novamente.');
             localStorage.removeItem('auth_token');
-            // Optional: Redirect to login if window.location is available (or handle in store)
-            if (window.location.pathname !== '/login') {
+            if (!isRedirectingToLogin && window.location.pathname !== '/login') {
+                isRedirectingToLogin = true;
+                toast.error('Sessão expirada. Faça login novamente.');
                 window.location.href = '/login';
             }
         } else if (error.response?.status === 403) {
             toast.error('Você não tem permissão para esta ação.');
+        } else if (error.response?.status === 429) {
+            // Rate limited — don't spam the user, just reject silently
         } else if (error.response?.status >= 500) {
             toast.error('Erro no servidor. Tente novamente mais tarde.');
-        } else {
-            // Don't toast 400s automatically as they might be validation errors handled by forms
-            // toast.error(message);
         }
 
         return Promise.reject(error);
