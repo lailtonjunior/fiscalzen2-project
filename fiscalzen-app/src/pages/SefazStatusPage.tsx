@@ -16,7 +16,9 @@ export function SefazStatusPage() {
         setLoading(true)
         setError(null)
         try {
+            console.log('[SefazStatusPage] Checking status...');
             const data = await sefazService.checkStatus()
+            console.log('[SefazStatusPage] Received data:', data);
             setStatus(data)
         } catch (err: any) {
             setError('Não foi possível comunicar com a SEFAZ ou com o servidor.')
@@ -105,7 +107,7 @@ export function SefazStatusPage() {
                                         <p className="text-xs text-muted-foreground mb-1">Certificado</p>
                                         <div className="flex items-center gap-2 font-medium">
                                             <ShieldCheck className="h-4 w-4" />
-                                            Mock Ativo
+                                            {status?.responseXml?.includes('<mock>') ? 'Mock Ativo (Dev)' : 'Certificado Carregado'}
                                         </div>
                                     </div>
                                 </div>

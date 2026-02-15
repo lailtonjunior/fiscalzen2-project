@@ -10,6 +10,8 @@ import {
     Logger,
     HttpStatus,
     HttpCode,
+    HttpException,
+    InternalServerErrorException,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiProduces } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bullmq';
@@ -20,6 +22,7 @@ import { QUEUE_NAMES } from '../../common/queue/queue.module';
 import { NFeTransmissionService } from './nfe-transmission.service';
 import { NFeXmlBuilderService } from './nfe-xml-builder.service';
 import { DanfeGeneratorService } from './danfe-generator.service';
+import { NFeDistributionService } from './nfe-distribution.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
     EmitirNFeDto,
@@ -50,8 +53,36 @@ export class NFeController {
         private readonly transmissionService: NFeTransmissionService,
         private readonly xmlBuilder: NFeXmlBuilderService,
         private readonly danfeGenerator: DanfeGeneratorService,
+        private readonly distributionService: NFeDistributionService,
         private readonly prisma: PrismaService,
     ) { }
+
+    @Post('sync')
+    @ApiOperation({ summary: 'Sincronizar notas da Sefaz' })
+    @ApiResponse({ status: 200, description: 'Sincronização iniciada com sucesso' })
+    async sync(@Request() req: AuthenticatedRequest) {
+        const companyId = req.user.empresaId;
+        try {
+            const result = await this.distributionService.fetchNewDocuments(companyId);
+            return result;
+        } catch (error) {
+            this.logger.error(`Sync error: ${error.message}`, error.stack);
+            throw new InternalServerErrorException(`Erro ao sincronizar: ${error.message}`);
+        }
+    }
+
+    @Get()
+    @ApiOperation({ summary: 'Listar notas fiscais' })
+    @ApiResponse({ status: 200, description: 'Lista de notas fiscais' })
+    async findAll(@Request() req: AuthenticatedRequest) {
+        const companyId = req.user.empresaId;
+        const notas = await this.prisma.notaFiscal.findMany({
+            where: { empresaId: companyId },
+            orderBy: { createdAt: 'desc' },
+            include: { tags: true }
+        });
+        return notas;
+    }
 
     @Post('emitir')
     @HttpCode(HttpStatus.ACCEPTED)

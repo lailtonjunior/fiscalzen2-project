@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateCompanyDto } from './dto';
-import { StorageService } from '../common/storage';
+import { CertificateService } from '../sefaz/certificate.service';
 
 @Injectable()
 export class CompaniesService {
@@ -9,7 +9,7 @@ export class CompaniesService {
 
     constructor(
         private readonly prisma: PrismaService,
-        private readonly storage: StorageService,
+        private readonly certificateService: CertificateService,
     ) { }
 
     async findByUserId(userId: string) {
@@ -59,23 +59,25 @@ export class CompaniesService {
     ) {
         const company = await this.findById(companyId);
 
-        // Generate unique key for the certificate
-        const key = `certificates/${companyId}/${Date.now()}_${file.originalname}`;
+        // Upload and validate using CertificateService
+        // This ensures the certificate is stored at the correct path (certificates/{companyId}/cert.pfx)
+        const result = await this.certificateService.uploadAndValidate(
+            companyId,
+            file.buffer,
+            password
+        );
 
-        // Upload to storage
-        const result = await this.storage.upload(key, file.buffer, file.mimetype);
-
-        this.logger.log(`Certificate uploaded: ${result.key}`);
-
-        // TODO: Parse .pfx file to extract metadata (expiry, issuer)
-        // For now, just return the storage result
-        // In production, use a library like `node-forge` to parse the certificate
+        // Update company with certificate password
+        await this.prisma.empresa.update({
+            where: { id: companyId },
+            data: { certPassword: password } as any,
+        });
 
         return {
             success: true,
-            key: result.key,
-            url: result.url,
-            message: 'Certificado enviado com sucesso',
+            key: result.storageKey,
+            // url: result.url, // URL might not be returned by uploadAndValidate, check it
+            message: 'Certificado enviado e validado com sucesso',
         };
     }
 }

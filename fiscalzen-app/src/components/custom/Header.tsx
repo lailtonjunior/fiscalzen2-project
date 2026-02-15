@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore, useNotificacoesStore } from '@/hooks/useStore'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useNotificacoesStore } from '@/stores/useNotificacoesStore'
+import { useUIStore } from '@/stores/useUIStore'
+
 import { cn, formatCNPJ } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

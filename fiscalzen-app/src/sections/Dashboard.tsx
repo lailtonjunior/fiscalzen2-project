@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDashboardStore, useNotasStore, useAuthStore } from '@/hooks/useStore'
+import { useDashboardStore } from '@/stores/useDashboardStore'
+import { useNotasStore } from '@/stores/useNotasStore'
+import { useAuthStore } from '@/stores/useAuthStore'
+
 import { cn, formatCurrency, formatDate, getStatusLabel } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -41,13 +44,30 @@ const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#a855f7', '#ef4444', '#f97316'
 
 export function Dashboard() {
   const navigate = useNavigate()
-  const { stats, minicharts, integrity, isLoading, periodo, setPeriodo, refreshStats } = useDashboardStore()
+  const { stats, minicharts, integrity, isLoading, periodo, setPeriodo, refreshStats, error } = useDashboardStore()
   const { notas } = useNotasStore()
-  const { empresa } = useAuthStore()
+  const { user, empresa } = useAuthStore()
 
   useEffect(() => {
     refreshStats()
-  }, [periodo])
+  }, [refreshStats])
+
+  if (isLoading && !stats) {
+    return <div className="p-8 text-center">Carregando dashboard...</div>
+  }
+
+  if (!stats) {
+    return <div className="p-8 text-center text-red-500">Erro ao carregar dados do dashboard. Tente recarregar.</div>
+  }
+
+  const {
+    totalNotas,
+    totalNotasMes,
+    notasPendentesManifestacao,
+    notasManifestadas, // Now safe to access
+    valorTotalNotas,
+    valorTotalMes
+  } = stats;
 
   // Get recent notas
   const notasRecentes = notas

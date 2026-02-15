@@ -1,4 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DashboardService } from './dashboard.service';
@@ -13,8 +14,8 @@ export class DashboardController {
     @Get('timeline')
     @ApiOperation({ summary: 'Obter linha do tempo de eventos' })
     @ApiResponse({ status: 200, description: 'Lista de eventos recentes.' })
-    async getTimeline() {
-        return this.dashboardService.getTimeline();
+    async getTimeline(@Request() req: any) {
+        return this.dashboardService.getTimeline(req.user.empresaId);
     }
 
     @Get('integrity')
@@ -23,4 +24,12 @@ export class DashboardController {
     async getIntegrity() {
         return this.dashboardService.getIntegrity();
     }
+
+    @Get('stats')
+    @ApiOperation({ summary: 'Obter estatísticas do dashboard' })
+    @ApiResponse({ status: 200, description: 'Estatísticas para gráficos e cards.' })
+    async getStats(@Request() req: any) {
+        return this.dashboardService.getStats(req.user.empresaId);
+    }
+
 }

@@ -12,6 +12,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { StorageModule } from './common/storage';
 import { QueueModule } from './common/queue';
 import { CompaniesModule } from './companies';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CompaniesModule } from './companies';
     PrismaModule,
     SefazModule,
     DashboardModule,
+    TagsModule,
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 60,

@@ -168,8 +168,11 @@ export class CertificateService {
         const storageKey = `certificates/${companyId}/cert.pfx`;
 
         // Check if exists in storage
+        this.logger.log(`Checking certificate existence at: ${storageKey}`);
         const exists = await this.storage.exists(storageKey);
+
         if (!exists) {
+            this.logger.warn(`Certificate not found at: ${storageKey}`);
             throw new BadRequestException(
                 'Certificado não encontrado. Faça o upload do certificado digital.',
             );
@@ -177,14 +180,21 @@ export class CertificateService {
 
         // Download from storage
         const pfxBuffer = await this.storage.download(storageKey);
+        this.logger.log(`Certificate downloaded (${pfxBuffer.length} bytes). Parsing...`);
 
         // Parse certificate
-        const parsed = this.parseCertificate(pfxBuffer, password);
+        try {
+            const parsed = this.parseCertificate(pfxBuffer, password);
+            this.logger.log(`Certificate parsed successfully via loadFromStorage.`);
 
-        // Cache it
-        this.cachedCertificates.set(cacheKey, parsed);
+            // Cache it
+            this.cachedCertificates.set(cacheKey, parsed);
 
-        return parsed;
+            return parsed;
+        } catch (error) {
+            this.logger.error(`Error parsing downloaded certificate: ${error.message}`);
+            throw error;
+        }
     }
 
     /**
@@ -239,5 +249,37 @@ export class CertificateService {
      */
     getPassword(): string {
         return process.env.CERT_PASSWORD || '';
+    }
+
+    /**
+     * Get HTTPS Agent for a company (Public wrapper)
+     */
+    async getHttpsAgent(companyId: string, password?: string): Promise<any> {
+        // We need to import https or return the agent created here
+        // Since createHttpsAgent is in SoapService and private, we should move it here or replicate
+        // Better design: CertificateService handles Certs, SoapService handles Transport
+        // But SoapService needs the Agent. 
+        // Let's rely on SoapService's existing private createHttpsAgent but exposed or 
+        // actually, NFeDistributionService calls soapService.sendSoapRequest passing an agent.
+        // So NFeDistributionService needs to CREATE the agent.
+
+        // Let's implement a simple agent creator here using forge
+        const certPassword = password || this.getPassword();
+        const parsed = await this.loadFromStorage(companyId, certPassword);
+
+        // Convert certificate and key to PEM
+        // We need 'forge' and 'https' which are imported
+        const certPem = forge.pki.certificateToPem(parsed.certificate);
+        const keyPem = forge.pki.privateKeyToPem(parsed.privateKey);
+
+        // We can't return https.Agent because 'https' might not be imported as a type in the signature if not exported
+        // But we can return 'any' or 'import("https").Agent'
+        // Let's use 'any' to avoid import issues unless strictly needed
+        return {
+            cert: certPem,
+            key: keyPem,
+            rejectUnauthorized: false,
+            minVersion: 'TLSv1.2',
+        };
     }
 }

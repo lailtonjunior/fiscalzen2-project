@@ -28,6 +28,7 @@ export class SoapService {
             cert: certPem,
             key: keyPem,
             rejectUnauthorized: false, // SEFAZ chains often not in root store
+            minVersion: 'TLSv1.2',
         });
     }
 
@@ -37,15 +38,18 @@ export class SoapService {
     async sendStatusCheck(
         xmlBody: string,
         companyId: string,
+        password?: string,
     ): Promise<SoapResponse> {
-        const password = this.certificateService.getPassword();
-        const parsed = await this.certificateService.loadFromStorage(companyId, password);
-        const agent = this.createHttpsAgent(parsed, password);
+        const certPassword = password || this.certificateService.getPassword();
+        const parsed = await this.certificateService.loadFromStorage(companyId, certPassword);
+        const agent = this.createHttpsAgent(parsed, certPassword);
 
         // URL SVRS Homologacao (Status Servico)
-        const url = 'https://nfe-homologacao.svrs.rs.gov.br/ws/NfeStatusServico/NfeStatusServico4.asmx';
+        // Correct RS URL: nfe-homologacao.sefazrs.rs.gov.br
+        const url = 'https://nfe-homologacao.sefazrs.rs.gov.br/ws/NfeStatusServico/NfeStatusServico4.asmx';
+        const action = 'http://www.portalfiscal.inf.br/nfe/wsdl/NfeStatusServico4/nfeStatusServicoNF';
 
-        return this.sendSoapRequest(url, xmlBody, agent);
+        return this.sendSoapRequest(url, xmlBody, agent, action);
     }
 
     /**
@@ -65,7 +69,9 @@ export class SoapService {
             ? 'https://nfe.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx'
             : 'https://nfe-homologacao.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx';
 
-        return this.sendSoapRequest(url, xmlBody, agent);
+        const action = 'http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4/nfeAutorizacaoLote';
+
+        return this.sendSoapRequest(url, xmlBody, agent, action);
     }
 
     /**
@@ -81,30 +87,37 @@ export class SoapService {
         const agent = this.createHttpsAgent(parsed, password);
 
         const url = production
-            ? 'https://nfe.svrs.rs.gov.br/ws/NfeRetAutorizacao/NFeRetAutorizacao4.asmx'
-            : 'https://nfe-homologacao.svrs.rs.gov.br/ws/NfeRetAutorizacao/NFeRetAutorizacao4.asmx';
+            ? 'https://nfe.sefazrs.rs.gov.br/ws/NfeRetAutorizacao/NFeRetAutorizacao4.asmx'
+            : 'https://nfe-homologacao.sefazrs.rs.gov.br/ws/NfeRetAutorizacao/NFeRetAutorizacao4.asmx';
 
-        return this.sendSoapRequest(url, xmlBody, agent);
+        const action = 'http://www.portalfiscal.inf.br/nfe/wsdl/NFeRetAutorizacao4/nfeRetAutorizacaoLote';
+
+        return this.sendSoapRequest(url, xmlBody, agent, action);
     }
 
     /**
      * Generic SOAP request sender
      */
-    private async sendSoapRequest(
+    public async sendSoapRequest(
         url: string,
         xmlBody: string,
         agent: https.Agent,
+        action: string,
     ): Promise<SoapResponse> {
         try {
-            this.logger.debug(`Sending SOAP request to ${url}`);
+            this.logger.log(`[SOAP] Sending request to ${url}`);
+            this.logger.debug(`[SOAP] Action: ${action}`);
 
             const response = await axios.post(url, xmlBody, {
                 headers: {
-                    'Content-Type': 'application/soap+xml; charset=utf-8',
+                    'Content-Type': `application/soap+xml; charset=utf-8; action="${action}"`,
                 },
                 httpsAgent: agent,
                 timeout: 30000, // 30 second timeout
             });
+
+            this.logger.log(`[SOAP] Response Status: ${response.status}`);
+            this.logger.debug(`[SOAP] Response Data: ${response.data}`);
 
             return {
                 status: response.status,

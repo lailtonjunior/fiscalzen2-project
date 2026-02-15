@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useNotasStore, useTagsStore } from '@/hooks/useStore'
+import { useNotasStore } from '@/stores/useNotasStore'
+import { useTagsStore } from '@/stores/useTagsStore'
+
 import { cn, formatCurrency, formatDate, formatCNPJCPF, formatChaveAcesso, getStatusLabel, getStatusColor, downloadFile } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -58,16 +60,18 @@ const ITEMS_PER_PAGE = 10
 export function NotasFiscais() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { 
-    notas, 
-    filtros, 
-    setFiltros, 
-    notasSelecionadas, 
+  const {
+    notas,
+    filtros,
+    setFiltros,
+    notasSelecionadas,
     toggleNotaSelecionada,
     selecionarTodas,
     limparSelecao,
     filtrarNotas,
-    atualizarStatusManifestacao
+    atualizarStatusManifestacao,
+    sincronizar,
+    loading
   } = useNotasStore()
   const { tags } = useTagsStore()
 
@@ -88,7 +92,7 @@ export function NotasFiscais() {
     const statusParam = searchParams.get('status')
     const manifestacaoParam = searchParams.get('manifestacao')
     const searchParam = searchParams.get('search')
-    
+
     if (statusParam) {
       setFiltros({ ...filtros, statusSefaz: [statusParam as any] })
     }
@@ -103,24 +107,24 @@ export function NotasFiscais() {
   // Filter notas
   const filteredNotas = useMemo(() => {
     let result = filtrarNotas()
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      result = result.filter(n => 
+      result = result.filter(n =>
         n.emitenteNome.toLowerCase().includes(query) ||
         n.emitenteCnpj.includes(query) ||
         n.chaveAcesso.includes(query) ||
         n.numero.includes(query)
       )
     }
-    
+
     if (dateRange?.from) {
       result = result.filter(n => new Date(n.dataEmissao) >= dateRange.from!)
     }
     if (dateRange?.to) {
       result = result.filter(n => new Date(n.dataEmissao) <= dateRange.to!)
     }
-    
+
     return result.sort((a, b) => new Date(b.dataEmissao).getTime() - new Date(a.dataEmissao).getTime())
   }, [notas, filtros, searchQuery, dateRange])
 
@@ -157,7 +161,7 @@ export function NotasFiscais() {
     </infNFe>
   </NFe>
 </nfeProc>`
-    
+
     if (tipo === 'xml' || tipo === 'ambos') {
       downloadFile(mockContent, `${nota.chaveAcesso}-nfe.xml`, 'application/xml')
     }
@@ -203,8 +207,12 @@ export function NotasFiscais() {
             <CheckCircle className="mr-2 h-4 w-4" />
             Manifestação
           </Button>
-          <Button onClick={() => navigate('/consulta-sefaz')}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <Button onClick={() => sincronizar()} disabled={loading}>
+            <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
+            Sincronizar
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/consulta-sefaz')}>
+            <Search className="mr-2 h-4 w-4" />
             Consultar SEFAZ
           </Button>
         </div>
@@ -223,7 +231,7 @@ export function NotasFiscais() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="min-w-[240px]">
@@ -254,8 +262,8 @@ export function NotasFiscais() {
               </PopoverContent>
             </Popover>
 
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(showFilters && 'bg-muted')}
             >
@@ -264,8 +272,8 @@ export function NotasFiscais() {
             </Button>
 
             {(searchQuery || dateRange?.from || Object.keys(filtros).length > 0) && (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={() => {
                   setSearchQuery('')
                   setDateRange(undefined)
@@ -282,7 +290,7 @@ export function NotasFiscais() {
             <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-4">
               <div>
                 <Label className="text-xs">Tipo de Documento</Label>
-                <Select 
+                <Select
                   value={filtros.tipo?.[0] || 'all'}
                   onValueChange={(v) => setFiltros({ ...filtros, tipo: v === 'all' ? undefined : [v as any] })}
                 >
@@ -404,8 +412,8 @@ export function NotasFiscais() {
                   <DropdownMenuContent>
                     {tags.map(tag => (
                       <DropdownMenuItem key={tag.id}>
-                        <div 
-                          className="w-3 h-3 rounded-full mr-2" 
+                        <div
+                          className="w-3 h-3 rounded-full mr-2"
                           style={{ backgroundColor: tag.cor }}
                         />
                         {tag.nome}
@@ -446,7 +454,7 @@ export function NotasFiscais() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12">
-                  <Checkbox 
+                  <Checkbox
                     checked={paginatedNotas.length > 0 && paginatedNotas.every(n => notasSelecionadas.includes(n.id))}
                     onCheckedChange={handleSelectAll}
                   />
@@ -474,7 +482,7 @@ export function NotasFiscais() {
                 paginatedNotas.map((nota) => (
                   <TableRow key={nota.id} className="cursor-pointer hover:bg-muted/50">
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox 
+                      <Checkbox
                         checked={notasSelecionadas.includes(nota.id)}
                         onCheckedChange={() => toggleNotaSelecionada(nota.id)}
                       />
@@ -502,8 +510,8 @@ export function NotasFiscais() {
                       </Badge>
                     </TableCell>
                     <TableCell onClick={() => { setSelectedNota(nota); setShowDetailDialog(true) }}>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={cn(
                           nota.statusManifestacao === 'confirmada' && 'border-green-500 text-green-600',
                           nota.statusManifestacao === 'pendente' && 'border-yellow-500 text-yellow-600',
@@ -697,8 +705,8 @@ export function NotasFiscais() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'ciencia')}
             >
@@ -708,8 +716,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Tomei ciência da operação</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'confirmada')}
             >
@@ -719,8 +727,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Confirmo a realização da operação</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'desconhecida')}
             >
@@ -730,8 +738,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Não reconheço esta operação</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleManifestacao(selectedNota, 'nao_realizada')}
             >
@@ -755,8 +763,8 @@ export function NotasFiscais() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleDownload(selectedNota, 'xml')}
             >
@@ -766,8 +774,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Arquivo XML oficial da SEFAZ</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleDownload(selectedNota, 'pdf')}
             >
@@ -777,8 +785,8 @@ export function NotasFiscais() {
                 <p className="text-sm text-muted-foreground">Documento auxiliar em PDF</p>
               </div>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start h-auto py-4"
               onClick={() => selectedNota && handleDownload(selectedNota, 'ambos')}
             >

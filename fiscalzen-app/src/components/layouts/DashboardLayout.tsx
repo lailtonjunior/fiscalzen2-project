@@ -2,9 +2,10 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { Sidebar } from '@/components/custom/Sidebar'
 import { Header } from '@/components/custom/Header'
 import { cn } from '@/lib/utils'
-import { useUIStore } from '@/hooks/useStore'
+import { useUIStore } from '@/stores/useUIStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useEffect } from 'react'
+
 
 export function DashboardLayout() {
     const { sidebarOpen } = useUIStore()

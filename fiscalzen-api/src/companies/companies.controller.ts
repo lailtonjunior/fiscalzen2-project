@@ -17,7 +17,7 @@ import { CompaniesService } from './companies.service';
 import { UpdateCompanyDto } from './dto';
 
 interface AuthenticatedRequest {
-    user: { sub: string; email: string };
+    user: { userId: string; email: string; empresaId: string };
 }
 
 @ApiTags('companies')
@@ -30,7 +30,7 @@ export class CompaniesController {
     @Get('me')
     @ApiOperation({ summary: 'Get current user company data' })
     async getMyCompany(@Request() req: AuthenticatedRequest) {
-        return this.companiesService.findByUserId(req.user.sub);
+        return this.companiesService.findByUserId(req.user.userId);
     }
 
     @Put('me')
@@ -39,7 +39,7 @@ export class CompaniesController {
         @Request() req: AuthenticatedRequest,
         @Body() dto: UpdateCompanyDto,
     ) {
-        const company = await this.companiesService.findByUserId(req.user.sub);
+        const company = await this.companiesService.findByUserId(req.user.userId);
         return this.companiesService.update(company.id, dto);
     }
 
@@ -85,7 +85,7 @@ export class CompaniesController {
             throw new BadRequestException('Senha do certificado é obrigatória');
         }
 
-        const company = await this.companiesService.findByUserId(req.user.sub);
+        const company = await this.companiesService.findByUserId(req.user.userId);
         return this.companiesService.uploadCertificate(company.id, file, password);
     }
 }

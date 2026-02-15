@@ -6,3 +6,4 @@ export * from './nfe.processor';
 export * from './nfe.controller';
 export * from './danfe-generator.service';
 export * from './dto';
+export * from './nfe-distribution.service';

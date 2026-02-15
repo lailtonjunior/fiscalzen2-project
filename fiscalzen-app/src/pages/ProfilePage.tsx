@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, User, Mail, Lock, Save } from 'lucide-react';
-import { useAuthStore } from '@/hooks/useStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+
 
 const profileSchema = z.object({
     nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),

@@ -1,6 +1,9 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { useUIStore, useAuthStore, useNotificacoesStore } from '@/hooks/useStore'
+import { useUIStore } from '@/stores/useUIStore'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useNotificacoesStore } from '@/stores/useNotificacoesStore'
+
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'

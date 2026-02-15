@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { XmlFactoryService } from './xml-factory.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { SoapService } from './soap.service';
 import { CertificateService } from './certificate.service';
 import { CertificateInfoDto } from './dto';
@@ -19,6 +20,7 @@ export class SefazService {
         private readonly xmlFactory: XmlFactoryService,
         private readonly soapService: SoapService,
         private readonly certificateService: CertificateService,
+        private readonly prisma: PrismaService,
     ) { }
 
     /**
@@ -32,17 +34,26 @@ export class SefazService {
             // 2. Wrap in Envelope
             const soapEnvelope = this.xmlFactory.wrapInSoapEnvelope(innerXml);
 
-            // MOCK MODE Check - if no companyId or in dev without cert
-            if (!companyId || process.env.NODE_ENV !== 'production') {
+            let certPassword = '';
+            if (companyId) {
+                const company = await this.prisma.empresa.findUnique({ where: { id: companyId } });
+                certPassword = (company as any)?.certPassword || process.env.CERT_PASSWORD || '';
+            }
+
+            // MOCK MODE Check 
+            // If no companyId, or if we are in dev AND don't have a specific cert password (optional logic)
+            // For now, let's try real if companyId is present.
+            if (!companyId) {
                 return {
                     success: true,
                     httpStatus: 200,
-                    responseXml: '<mock>Sefaz Status OK (Mock)</mock>',
+                    responseXml: '<mock>Sefaz Status OK (Mock - No Company)</mock>',
                 };
             }
 
             // 3. Send
-            const response = await this.soapService.sendStatusCheck(soapEnvelope, companyId);
+            // We pass the password to soapService (which we will update next)
+            const response = await this.soapService.sendStatusCheck(soapEnvelope, companyId, certPassword);
 
             return {
                 success: true,
@@ -50,10 +61,16 @@ export class SefazService {
                 responseXml: response.data,
             };
         } catch (error) {
-            this.logger.error('Status check failed:', error.message);
+            this.logger.error(`Status check failed for company ${companyId}`);
+            try {
+                this.logger.error(`Error details: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+            } catch (e) {
+                this.logger.error(`Could not stringify error: ${error}`);
+            }
+
             return {
                 success: false,
-                error: error.message,
+                error: (error as any).message || 'Erro desconhecido ao consultar Sefaz',
             };
         }
     }
